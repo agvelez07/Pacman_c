@@ -1,0 +1,25 @@
+﻿  main.c
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(79,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(79,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(81,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(81,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(89,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(89,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(91,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(91,20): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(99,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(99,22): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(101,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(101,23): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(114,15): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(114,30): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(114,45): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(115,15): warning C4244: 'function': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(115,34): warning C4244: 'function': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(121,20): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(121,29): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(122,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(122,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(122,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\main.c(187,19): warning C4113: 'void (__cdecl *)(char,int,int)' differs in parameter lists from 'void (__cdecl *)(unsigned char,int,int)'
+LINK : fatal error LNK1104: cannot open file 'freeglutd.lib'
