@@ -67,7 +67,7 @@ void initCharacter(char** map)
     HousePos* houses = (HousePos*)malloc(sizeof(HousePos) * max);
     if (!houses) return;
 
-    int count = collectHouses(map, houses);
+    int count = getAvailableHouses(map, houses);
     if (count > 0) {
         int k = rand() % count;
         gPac.c = houses[k].c;
@@ -93,7 +93,7 @@ void drawCharacter(void)
         glTranslatef(gPac.c * 2.0, gPac.r * 2.0, 0.25);
         glScalef(0.6, 0.6, 0.6);
 
-        drawPacmanCube();
+        drawPacman();
 
     glPopMatrix();
 }
