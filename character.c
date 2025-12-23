@@ -26,7 +26,8 @@ int getMapInd(char** m, int index[][2]){
 }
 
 HousePos createhousePos(){
-  HousePos housePost = malloc(HousePos)SizeOf(housePos);
+  int max = int max = xTabSize() * yTabSize();
+  HousePos* housePost = malloc(SizeOf(HousePos * max);
   return housePos;  
 }
 
