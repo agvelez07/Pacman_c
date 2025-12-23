@@ -31,7 +31,7 @@ static void polygon(int a, int b, int c, int d)
     glEnd();
 }
 
-static void drawPacmanCube(void)
+static void drawPacman(void)
 {
     glColor3f(1.0, 1.0, 0.0); 
     polygon(0, 3, 2, 1);
@@ -42,7 +42,7 @@ static void drawPacmanCube(void)
     polygon(0, 1, 5, 4);
 }
 
-static int collectHouses(char** map, HousePos* houses)
+static int getAvailableHouses(char** map, HousePos* houses)
 {
     int count = 0;
     for (int c = 0; c < xTabSize(); c++) {
@@ -57,7 +57,7 @@ static int collectHouses(char** map, HousePos* houses)
     return count;
 }
 
-void characterInit(char** map)
+void initCharacter(char** map)
 {
     if (!map) return;
 
@@ -78,7 +78,7 @@ void characterInit(char** map)
     free(houses);
 }
 
-void character_draw(void)
+void drawCharacter(void)
 {
     int maxSize = xTabSize() > yTabSize() ? xTabSize() : yTabSize();
     if (maxSize <= 0) return;
@@ -98,12 +98,12 @@ void character_draw(void)
     glPopMatrix();
 }
 
-Pacman character_get_pos(void)
+Pacman getCharacterPos(void)
 {
     return gPac;
 }
 
-int character_try_move(char** map, int dc, int dr)
+int moveCharacter(char** map, int dc, int dr)
 {
     if (!map) return 0;
 
