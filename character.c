@@ -7,6 +7,11 @@ int r;
 int c;
 }HousePos;
 
+typedef struct{
+int r;
+int c;
+}Pacman;
+
 void getMapInd(char** m, HousePos* housePosArr){
   if(housePosARR && m){
     int count = 0;
@@ -29,8 +34,11 @@ HousePos createhousePos(){
   return housePos;  
 }
 
+
+
 int createCharacter(char** m) {
   HousePos* housePosArr = createhousePos();
-  getMapInd(m);
+  getMapInd(m, housePosArr);
+  createPacman();
 
 }
