@@ -4,17 +4,17 @@
 #include <stdio.h>
 
 static GLfloat vertices[][3] = {
-    {-1.0f,-1.0f,-0.1f},{ 1.0f,-1.0f,-0.1f},
-    { 1.0f, 1.0f,-0.1f},{-1.0f, 1.0f,-0.1f},
-    {-1.0f,-1.0f, 0.1f},{ 1.0f,-1.0f, 0.1f},
-    { 1.0f, 1.0f, 0.1f},{-1.0f, 1.0f, 0.1f}
+    {-1.0,-1.0,-0.1},{ 1.0,-1.0,-0.1},
+    { 1.0, 1.0,-0.1},{-1.0, 1.0,-0.1},
+    {-1.0,-1.0, 0.1},{ 1.0,-1.0, 0.1},
+    { 1.0, 1.0, 0.1},{-1.0, 1.0, 0.1}
 };
 
 static GLfloat normals[][3] = {
-    {-1.0f,-1.0f,-1.0f},{ 1.0f,-1.0f,-1.0f},
-    { 1.0f, 1.0f,-1.0f},{-1.0f, 1.0f,-1.0f},
-    {-1.0f,-1.0f, 1.0f},{ 1.0f,-1.0f, 1.0f},
-    { 1.0f, 1.0f, 1.0f},{-1.0f, 1.0f, 1.0f}
+    {-1.0,-1.0,-1.0},{ 1.0,-1.0,-1.0},
+    { 1.0, 1.0,-1.0},{-1.0, 1.0,-1.0},
+    {-1.0,-1.0, 1.0},{ 1.0,-1.0, 1.0},
+    { 1.0, 1.0, 1.0},{-1.0, 1.0, 1.0}
 };
 
 static Pacman gPac = {0, 0};
@@ -33,7 +33,7 @@ static void polygon(int a, int b, int c, int d)
 
 static void drawPacmanCube(void)
 {
-    glColor3f(1.0f, 1.0f, 0.0f); 
+    glColor3f(1.0, 1.0, 0.0); 
     polygon(0, 3, 2, 1);
     polygon(2, 3, 7, 6);
     polygon(0, 4, 7, 3);
@@ -57,7 +57,7 @@ static int collectHouses(char** map, HousePos* houses)
     return count;
 }
 
-void character_init(char** map)
+void characterInit(char** map)
 {
     if (!map) return;
 
@@ -83,15 +83,15 @@ void character_draw(void)
     int maxSize = xTabSize() > yTabSize() ? xTabSize() : yTabSize();
     if (maxSize <= 0) return;
 
-    float S = 1.0f / (float)maxSize;
+    float S = 1.0 / (float)maxSize;
 
     glPushMatrix();
 
         glScalef(S, S, S);
-        glTranslatef(-(xTabSize() - 1), -(yTabSize() - 1), 0.0f);
+        glTranslatef(-(xTabSize() - 1), -(yTabSize() - 1), 0.0);
 
-        glTranslatef(gPac.c * 2.0f, gPac.r * 2.0f, 0.25f);
-        glScalef(0.6f, 0.6f, 0.6f);
+        glTranslatef(gPac.c * 2.0, gPac.r * 2.0, 0.25);
+        glScalef(0.6, 0.6, 0.6);
 
         drawPacmanCube();
 
