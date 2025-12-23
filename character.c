@@ -8,13 +8,13 @@ int c;
 }HousePos;
 
 void getMapInd(char** m, HousePos* housePosArr){
-  if(housePos && m){
+  if(housePosARR && m){
     int count = 0;
     for(int i = 0; i < xTable(); i++){
       for(int j = 0; j < yTable(); j++){
         if(m[i][j] == 1){
-            housePost[count].r = i;
-            housePost[count].c = j;
+            housePosArr[count].r = i;
+            housePosArr[count].c = j;
             count++;
           }
         }
@@ -30,7 +30,7 @@ HousePos createhousePos(){
 }
 
 int createCharacter(char** m) {
-  createhousePos();
+  HousePos* housePosArr = createhousePos();
   getMapInd(m);
 
 }
