@@ -2,14 +2,13 @@
 #include <stdlib.h>
 #include <stdio.h>
  
-type struct{
+typedef struct{
 int r;
 int c;
 }HousePos;
 
-void getMapInd(char** m){
-  if(housePos){
-  {
+void getMapInd(char** m, HousePos* housePosArr){
+  if(housePos && m){
     int count = 0;
     for(int i = 0; i < xTable(); i++){
       for(int j = 0; j < yTable(); j++){
