@@ -21,4 +21,16 @@ typedef struct {
     int occupied;  // 0 vazio | 1 pacman | 2 ghost
 } TileStatus;
 
+TileStatus* createTilesStatus(void)
+{
+    int mapSize = xTabSize() * yTabSize();                
+    TileStatus* tiles = (TileStatus*)malloc(sizeof(TileStatus) * mapSize);
+    return tiles;                                          
+}
+
+Board* createBoard(char** map)
+{
+    Board* b = (Board*)malloc(sizeof(Board));
+}
+
 
