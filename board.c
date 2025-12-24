@@ -15,9 +15,10 @@ typedef struct {
     int gameOver;        // 0/1
 } Board;
 
-
 typedef struct {
     int wallOn;    // 1 = buraco/limite (map==0)
     int visited;   // 1 = pacman passou
     int occupied;  // 0 vazio | 1 pacman | 2 ghost
 } TileStatus;
+
+
