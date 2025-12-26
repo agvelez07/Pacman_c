@@ -146,11 +146,14 @@
   <ItemGroup>
     <ClCompile Include="board.c" />
     <ClCompile Include="character.c" />
+    <ClCompile Include="cube.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="pm-maps.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="board.h" />
     <ClInclude Include="character.h" />
+    <ClInclude Include="cube.h" />
     <ClInclude Include="pm-maps.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
