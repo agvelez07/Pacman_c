@@ -1,0 +1,65 @@
+# =========================
+# Visual Studio
+# =========================
+.vs
+.user
+.suo
+.userosscache
+.sln.docstates
+
+# =========================
+# Build folders
+# =========================
+Debug
+Release
+x64
+x86
+Debug
+Release
+
+# =========================
+# Executáveis e binários
+# =========================
+.exe
+.dll
+.pdb
+.ilk
+.obj
+.lib
+.exp
+
+# =========================
+# Logs e temporários
+# =========================
+.log
+.tlog
+.idb
+.cache
+
+# =========================
+# vcpkg (dependências locais)
+# =========================
+vcpkg
+vcpkg_installed
+
+# =========================
+# OpenGL  GLUT temporários
+# =========================
+.opengl
+.glslc
+
+# =========================
+# Sistema
+# =========================
+Thumbs.db
+.DS_Store
+
+# =========================
+# NÃO ignorar ficheiros importantes
+# =========================
+!.c
+!.h
+!.txt
+!.sln
+!.vcxproj
+!.vcxproj.filters

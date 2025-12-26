@@ -47,7 +47,7 @@ static int getAvailableHouses(char** map, HousePos* houses)
     int count = 0;
     for (int c = 0; c < xTabSize(); c++) {
         for (int r = 0; r < yTabSize(); r++) {
-            if (map[c][r] == 1) {
+            if (map[c][r] == '1') {
                 houses[count].c = c;
                 houses[count].r = r;
                 count++;
@@ -59,14 +59,16 @@ static int getAvailableHouses(char** map, HousePos* houses)
 
 void initCharacter(char** map)
 {
+	printf("Initializing Pacman character...\n");
     if (!map) return;
-
+     
+	printf("Map size: x=%d y=%d\n", xTabSize(), yTabSize());
     int max = xTabSize() * yTabSize();
     if (max <= 0) return;
-
+	printf("Max possible houses: %d\n", max);
     HousePos* houses = (HousePos*)malloc(sizeof(HousePos) * max);
     if (!houses) return;
-
+	printf("Memory for houses allocated.\n");
     int count = getAvailableHouses(map, houses);
     if (count > 0) {
         int k = rand() % count;
@@ -74,6 +76,7 @@ void initCharacter(char** map)
         gPac.r = houses[k].r;
         printf("Pacman spawn: c=%d r=%d\n", gPac.c, gPac.r);
     }
+    printf("Pacman initialized");
 
     free(houses);
 }
@@ -90,7 +93,7 @@ void drawCharacter(void)
         glScalef(S, S, S);
         glTranslatef(-(xTabSize() - 1), -(yTabSize() - 1), 0.0);
 
-        glTranslatef(gPac.c * 2.0, gPac.r * 2.0, 0.25);
+        glTranslatef(gPac.c * 2.0, gPac.r * 2.0, 0.5);
         glScalef(0.6, 0.6, 0.6);
 
         drawPacman();
