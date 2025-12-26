@@ -11,6 +11,9 @@
 #include "character.h"
 #include <math.h>
 
+#define W 500
+#define H 500
+
 static GLfloat vertices[][3] = {
     {-1.0,-1.0,-0.1},{ 1.0,-1.0,-0.1},
     { 1.0, 1.0,-0.1},{-1.0, 1.0,-0.1},
@@ -44,6 +47,9 @@ double centerY;
 double maxX;
 double maxY;
 
+double minX;
+double minY;
+
 static void polygon(int a, int b, int c, int d)
 {
     glBegin(GL_POLYGON);
@@ -74,8 +80,11 @@ void drawRawMap(char** m)
     centerX = (cols - 1);
     centerY = (rows - 1);
 
-    maxX = centerX * 2;
-    maxY = centerY * 2;
+    maxX = centerX + (W/2);
+    maxY = centerY + (H/2);
+
+    minX = centerX - W;
+    minY = centerY - H;
 
     glPushMatrix();
 
@@ -119,8 +128,8 @@ static void teclado(unsigned char key, int x, int y)
     double pan = 0.3;
     double zoom = 0.7;
 
-    if (key == 'x') camX += pan;
-    if (key == 'X') camX -= pan;
+    if (key == 'x' && camX <= maxX) camX += pan;
+    if (key == 'X' && camX >= minX) camX -= pan;
 
     if (key == 'y') camY += pan;
     if (key == 'Y') camY -= pan;
@@ -157,7 +166,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(500, 500);
+    glutInitWindowSize(W, H);
     glutCreateWindow("Pac-Man");
 
     glutDisplayFunc(display);
