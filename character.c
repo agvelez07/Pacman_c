@@ -52,13 +52,29 @@ static void polygon(int a, int b, int c, int d)
 
 static void drawPacman(void)
 {
-    glColor3f(1.0, 1.0, 0.0);
-    polygon(0, 3, 2, 1);
-    polygon(2, 3, 7, 6);
-    polygon(0, 4, 7, 3);
-    polygon(1, 2, 6, 5);
-    polygon(4, 5, 6, 7);
-    polygon(0, 1, 5, 4);
+   glColor3f(1.0f, 1.0f, 0.0f);
+
+    for (int i = 0; i < stackCount; ++i)
+    {
+        glBegin(GL_QUAD_STRIP);
+
+        for (int j = 0; j <= sectorCount; ++j)
+        {
+            int k1 = i * (sectorCount + 1) + j;
+            int k2 = (i + 1) * (sectorCount + 1) + j;
+
+            if (k2 >= VERT_MAX) continue;
+
+            glNormal3fv(sphereNormals[k1]);
+            glVertex3fv(sphereVertices[k1]);
+
+            glNormal3fv(sphereNormals[k2]);
+            glVertex3fv(sphereVertices[k2]);
+        }
+
+        glEnd();
+    }
+}
 }
 
 typedef struct {
