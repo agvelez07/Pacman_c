@@ -24,6 +24,8 @@ int main(int argc, char** argv)
 
     glEnable(GL_DEPTH_TEST);
 
+    glutTimerFunc(16, timer, 0);
+    
     boardInit(argc <= 1 ? "pm-simple.txt" : argv[1]);
 
     glutDisplayFunc(boardDisplay);
@@ -32,4 +34,5 @@ int main(int argc, char** argv)
 
     glutMainLoop();
     return 0;
+
 }
