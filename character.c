@@ -25,6 +25,8 @@ struct pacman {
 
 static struct pacman pacData = { 0, 0, 0 };
 static Pacman pac = &pacData;
+float mouthAngleDeg = 10.0;
+int mouthOpening = 1;
 
 static GLfloat vertices[][3] = {
     {-1.0,-1.0,-0.1},{ 1.0,-1.0,-0.1},
@@ -50,16 +52,45 @@ static void polygon(int a, int b, int c, int d)
     glEnd();
 }
 
+void timer(int v)
+{
+    updateMouth();
+    glutPostRedisplay();
+    glutTimerFunc(16, timer, 0);
+}
+
+void updateMouth(void)
+{
+    if (mouthOpening){
+        mouthAngleDeg += 1.0;
+    }
+    else{
+        mouthAngleDeg -= 1.0;
+    }
+
+    if (mouthAngleDeg > 40.0) mouthOpening = 0;
+    if (mouthAngleDeg < 5.0)  mouthOpening = 1;
+}
+
+
+
 static void drawPacman(void)
 {
    glColor3f(1.0f, 1.0f, 0.0f);
-
+ 
+    int cut = (int)((mouthAngleDeg / 360.0) * (float)sectorCount);
+    if (cut < 0) cut = 0;
+    if (cut > sectorCount / 2) cut = sectorCount / 2;
+ 
     for (int i = 0; i < stackCount; ++i)
     {
-        glBegin(GL_QUAD_STRIP);
-
+        glBegin(GL_QUAD_STRIP); 
         for (int j = 0; j <= sectorCount; ++j)
-        {
+        { 
+            if (j <= cut || j >= (sectorCount - cut)){
+                continue;
+            }
+
             int k1 = i * (sectorCount + 1) + j;
             int k2 = (i + 1) * (sectorCount + 1) + j;
 
@@ -74,7 +105,6 @@ static void drawPacman(void)
 
         glEnd();
     }
-}
 }
 
 typedef struct {
