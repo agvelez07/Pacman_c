@@ -7,6 +7,8 @@ void characterInit(void);
 void characterDraw(void);
 int characterMove(unsigned char key);
 
+void timer(int v)
+
 int getPacmanRow(Pacman p);
 int getPacmanCol(Pacman p);
 
