@@ -24,13 +24,7 @@ int main(int argc, char** argv)
 
     glEnable(GL_DEPTH_TEST);
 
-    if (argc <= 1) openMapsFile("pm-simple.txt");
-    else openMapsFile(argv[1]);
-
-    mapRef = nextMap();
-
-    characterInit(mapRef);
-    boardInit(mapRef);
+    boardInit(argc <= 1 ? "pm-simple.txt" : argv[1]);
 
     glutDisplayFunc(boardDisplay);
     glutReshapeFunc(boardReshape);

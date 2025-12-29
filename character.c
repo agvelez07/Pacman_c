@@ -6,6 +6,7 @@
 
 #include "character.h"
 #include "pm-maps.h"
+#include "board.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -15,8 +16,6 @@ struct pacman {
     int r;
     int alive;
 };
-
-static char** mapRef = NULL;
 
 static struct pacman pacData = { 0, 0, 0 };
 static Pacman pac = &pacData;
@@ -61,46 +60,64 @@ typedef struct {
     int r;
 } HousePos;
 
-static int collectHouses(char** map, HousePos* houses)
+static int collectHouses(Map m, HousePos* houses, int max)
 {
     int count = 0;
-    int cols = xTabSize();
-    int rows = yTabSize();
+    int cols = mapXSize(m);
+    int rows = mapYSize(m);
 
-    for (int c = 0; c < cols; c++) {
-        for (int r = 0; r < rows; r++) {
-            if (map[c][r] == '1' || map[c][r] == 1) {
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            Cell cell = cellAt(m, r, c);
+            if (!cell) continue;
+            if (!cellIsWall(cell)) continue;
+            if (count < max) {
                 houses[count].c = c;
                 houses[count].r = r;
                 count++;
             }
         }
     }
+
     return count;
 }
 
-void characterInit(char** map)
+int getPacmanRow(Pacman p)
 {
-    mapRef = map;
-    if (!mapRef) return;
+    return p ? p->r : -1;
+}
+
+int getPacmanCol(Pacman p)
+{
+    return p ? p->c : -1;
+}
+
+void characterInit(void)
+{
+    Map m = getCurrentMap();
+    if (!m) return;
 
     static int seeded = 0;
-    if (!seeded) { srand((unsigned)time(NULL)); seeded = 1; }
+    if (!seeded) {
+        srand((unsigned)time(NULL));
+        seeded = 1;
+    }
 
-    int cols = xTabSize();
-    int rows = yTabSize();
+    int cols = mapXSize(m);
+    int rows = mapYSize(m);
     int max = cols * rows;
     if (max <= 0) return;
 
     HousePos* houses = (HousePos*)malloc((size_t)max * sizeof(HousePos));
     if (!houses) return;
 
-    int count = collectHouses(mapRef, houses);
+    int count = collectHouses(m, houses, max);
     if (count > 0) {
         int k = rand() % count;
         pac->c = houses[k].c;
         pac->r = houses[k].r;
         pac->alive = 1;
+        setBoardPacman(pac);
     }
 
     free(houses);
@@ -108,20 +125,28 @@ void characterInit(char** map)
 
 void characterDraw(void)
 {
-    int cols = xTabSize();
-    int rows = yTabSize();
+    Map m = getCurrentMap();
+    if (!m) return;
+
+    Pacman p = getPacman();
+    if (!p || p->alive != 1) return;
+
+    int cols = mapXSize(m);
+    int rows = mapYSize(m);
     int maxSize = cols > rows ? cols : rows;
     if (maxSize <= 0) return;
 
     GLfloat s = 1.0 / (GLfloat)maxSize;
+
+    int rr = (rows - 1) - p->r;
 
     glPushMatrix();
 
     glScalef(s, s, s);
     glTranslatef(-(GLfloat)(cols - 1), -(GLfloat)(rows - 1), 0.0);
 
-    glTranslatef((GLfloat)(pac->c * 2), (GLfloat)(pac->r * 2), 0.5);
-    glScalef(0.6f, 0.6f, 0.6f);
+    glTranslatef((GLfloat)(p->c * 2), (GLfloat)(rr * 2), 0.6);
+    glScalef(0.6, 0.6, 0.6);
 
     drawPacman();
 
@@ -130,33 +155,31 @@ void characterDraw(void)
 
 int characterMove(unsigned char key)
 {
-    if (!mapRef) return 0;
-    if (!pac || pac->alive != 1) return 0;
+    Map m = getCurrentMap();
+    if (!m) return 0;
+
+    Pacman p = getPacman();
+    if (!p || p->alive != 1) return 0;
 
     int dc = 0;
     int dr = 0;
 
-    if (key == 'w' || key == 'W') dr = 1;
-    if (key == 's' || key == 'S') dr = -1;
+    if (key == 'w' || key == 'W') dr = -1;
+    if (key == 's' || key == 'S') dr = 1;
     if (key == 'd' || key == 'D') dc = 1;
     if (key == 'a' || key == 'A') dc = -1;
 
     if (dc == 0 && dr == 0) return 0;
 
-    int nc = pac->c + dc;
-    int nr = pac->r + dr;
+    int nc = p->c + dc;
+    int nr = p->r + dr;
 
-    if (nc < 0 || nc >= xTabSize()) return 0;
-    if (nr < 0 || nr >= yTabSize()) return 0;
+    Cell next = cellAt(m, nr, nc);
+    if (!next) return 0;
+    if (!cellIsWall(next)) return 0;
 
-    if (!(mapRef[nc][nr] == '1' || mapRef[nc][nr] == 1)) return 0;
+    p->c = nc;
+    p->r = nr;
 
-    pac->c = nc;
-    pac->r = nr;
     return 1;
-}
-
-Pacman characterGet(void)
-{
-    return pac;
 }

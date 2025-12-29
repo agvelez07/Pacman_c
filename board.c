@@ -4,17 +4,24 @@
 #include <GL/glut.h>
 #endif
 
+#include <stdlib.h>
+
 #include "board.h"
 #include "cube.h"
 #include "pm-maps.h"
 #include "character.h"
 
-#include <stdlib.h>
-
 #define W 500
 #define H 500
 
-static char** mapRef = NULL;
+struct board {
+    Map* maps;
+    int mapsCount;
+    int currentMap;
+    int wallMode;
+    int gameStatus;
+    Pacman pacman;
+};
 
 static GLfloat camX = 0.0;
 static GLfloat camY = 0.0;
@@ -27,13 +34,51 @@ static GLfloat maxY = 0.0;
 static GLfloat minX = 0.0;
 static GLfloat minY = 0.0;
 
-static void drawRawMap(char** map)
+static Board gBoard = NULL;
+
+Board getBoard(void)
 {
-    int cols = xTabSize();
-    int rows = yTabSize();
+    return gBoard;
+}
+
+Map getCurrentMap(void)
+{
+    if (gBoard && gBoard->mapsCount > 0)
+        return gBoard->maps[gBoard->currentMap];
+    return NULL;
+}
+
+int getBoardMapCount(void)
+{
+    return gBoard ? gBoard->mapsCount : 0;
+}
+
+int getCurrentMapIndex(void)
+{
+    return (gBoard && gBoard->mapsCount > 0) ? gBoard->currentMap : -1;
+}
+
+Pacman getPacman(void)
+{
+    return gBoard ? gBoard->pacman : NULL;
+}
+
+int setBoardPacman(Pacman p)
+{
+    if (!gBoard) return 0;
+    gBoard->pacman = p;
+    return 1;
+}
+
+static void drawMap(Map m)
+{
+    if (!m) return;
+
+    int cols = mapXSize(m);
+    int rows = mapYSize(m);
     int maxSize = cols > rows ? cols : rows;
 
-    if (!map || cols <= 0 || rows <= 0) return;
+    if (cols <= 0 || rows <= 0 || maxSize <= 0) return;
 
     centerX = (GLfloat)(cols - 1);
     centerY = (GLfloat)(rows - 1);
@@ -49,27 +94,71 @@ static void drawRawMap(char** map)
     glScalef(1.0 / (GLfloat)maxSize, 1.0 / (GLfloat)maxSize, 1.0 / (GLfloat)maxSize);
     glTranslatef(-centerX, -centerY, 0.0);
 
-    for (int c = 0; c < cols; c++) {
-        for (int r = 0; r < rows; r++) {
-            if (map[c][r] == '1' || map[c][r] == 1) {
-                glPushMatrix();
-                glTranslatef((GLfloat)(c * 2), (GLfloat)(r * 2), 0.0);
-                glScalef(0.8, 0.8, 0.8);
-                colorCube();
-                glPopMatrix();
-            }
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+
+            Cell cell = cellAt(m, r, c);
+            if (!cell) continue;
+
+            if (!cellIsWall(cell)) continue;
+
+            glPushMatrix();
+            int rr = (rows - 1) - r;
+            glTranslatef((GLfloat)(c * 2), (GLfloat)(rr * 2), 0.0);
+            glScalef(0.9, 0.9, 0.2);
+
+            glColor3f(0.2, 0.2, 0.2);
+            colorCube();
+
+            glPopMatrix();
         }
     }
 
     glPopMatrix();
 }
 
-void boardInit(char** map)
+static void boardFreeMaps(Board b)
 {
-    mapRef = map;
-    camX = 0.0;
-    camY = 0.0;
-    camZ = 12.0;
+    if (!b) return;
+
+    for (int i = 0; i < b->mapsCount; i++)
+        mapDestroy(b->maps[i]);
+
+    free(b->maps);
+    b->maps = NULL;
+    b->mapsCount = 0;
+}
+
+void boardDestroy(void)
+{
+    if (!gBoard) return;
+
+    boardFreeMaps(gBoard);
+
+    free(gBoard);
+    gBoard = NULL;
+}
+
+void boardInit(const char* mapFile)
+{
+    if (gBoard) return;
+
+    gBoard = (Board)malloc(sizeof(struct board));
+    if (!gBoard) exit(1);
+
+    gBoard->maps = NULL;
+    gBoard->mapsCount = 0;
+    gBoard->currentMap = 0;
+    gBoard->wallMode = 0;
+    gBoard->gameStatus = 0;
+    gBoard->pacman = NULL;
+
+    gBoard->mapsCount = readAllMaps(&gBoard->maps, mapFile);
+    if (gBoard->mapsCount <= 0) exit(1);
+
+    gBoard->currentMap = 0;
+
+    characterInit();
 }
 
 void boardDisplay(void)
@@ -82,7 +171,9 @@ void boardDisplay(void)
     glTranslatef(0.0, 0.0, -camZ);
     glTranslatef(-camX, -camY, 0.0);
 
-    drawRawMap(mapRef);
+    if (gBoard && gBoard->mapsCount > 0)
+        drawMap(gBoard->maps[gBoard->currentMap]);
+
     characterDraw();
 
     glutSwapBuffers();
@@ -109,6 +200,13 @@ void boardKey(unsigned char key, int x, int y)
         camX = 0.0;
         camY = 0.0;
         camZ = 12.0;
+    }
+
+    if (key == 'n' || key == 'N') {
+        if (gBoard && gBoard->mapsCount > 0) {
+            gBoard->currentMap = (gBoard->currentMap + 1) % gBoard->mapsCount;
+            characterInit();
+        }
     }
 
     if (key == 'w' || key == 'W' ||

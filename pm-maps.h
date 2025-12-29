@@ -1,37 +1,25 @@
-#ifndef __PM_MAPS_H__
-#define __PM_MAPS_H__
+#ifndef PM_MAPS_H
+#define PM_MAPS_H
 
-//  Library for reading PAC-MAN Maps files
-//  (c) Luis Baptista @ ipportalegre.pt 8-january-2022
-//
-//  A PAC-MAN Maps File has the following structure
-//    file :- <numberOfMaps>
-//            <map>*
-//
-//    map :- <numberOfGhost> <numberOfSmartGhosts>
-//           <xTabSize> <yTabSize>
-//           <0/1-stringLine>*
+typedef struct map* Map;
+typedef struct cell* Cell;
 
-//  In memory, a PAC-MAN Map is a XY-matrix of char with 0/1 in each position
-//    0 - an obstacle / a hole in the map
-//    1 - a cell in the map
+int openMapsFile(const char* filename);
+void closeMapsFile(void);
 
-// IMPORTANT: All the memory for the maps is dynamically managed inside the library (malloc and free).
-//   WARNING: The map matrix is intended only for copy for your own strutures!
-//            When getting the next map, the memory allocated for the previous one is deleted!
+Map mapCreate(void);
+void mapDestroy(Map m);
+void deleteMap(Map m);
 
-void openMapsFile(char* name);
-void closeMapsFile();
+int nextMap(Map m);
+int readAllMaps(Map** maps, const char* filename);
 
-int numberOfMaps();
+Cell cellAt(Map m, int r, int c);
 
-char** nextMap();
-char** getMap();       // the last map read
-int xTabSize();
-int yTabSize();
-int numGhosts();
-int numSmartGhosts();
+int mapXSize(Map m);
+int mapYSize(Map m);
 
-void printMap();
+int cellIsWall(Cell c);
+int getCellOccupied(Cell c);
 
-#endif // !__PM_MAPS_H__
+#endif

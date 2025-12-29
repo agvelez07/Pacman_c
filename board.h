@@ -1,15 +1,25 @@
-#ifndef BOARDH
-#define BOARDH
+#ifndef BOARD_H
+#define BOARD_H
 
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
+#include "pm-maps.h"
+#include "character.h"
 
-void boardInit(char** map);
+typedef struct board* Board;
+
+void boardInit(const char* mapFile);
+void boardDestroy(void);
+
+Board getBoard(void);
+
+Map getCurrentMap(void);
+int getBoardMapCount(void);
+int getCurrentMapIndex(void);
+
+Pacman getPacman(void);
+int setBoardPacman(Pacman p);
+
 void boardDisplay(void);
-void boardKey(unsigned char key, int x, int y);
 void boardReshape(int w, int h);
+void boardKey(unsigned char key, int x, int y);
 
 #endif
