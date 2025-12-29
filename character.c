@@ -10,6 +10,12 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
+
+#define PI 3.14159f
+#define STACK_MAX  64
+#define SECTOR_MAX 64
+#define VERT_MAX ((STACK_MAX + 1) * (SECTOR_MAX + 1))
 
 struct pacman {
     int c;
@@ -177,9 +183,61 @@ int characterMove(unsigned char key)
     Cell next = cellAt(m, nr, nc);
     if (!next) return 0;
     if (!cellIsWall(next)) return 0;
-
+    
     p->c = nc;
     p->r = nr;
 
     return 1;
+}
+
+
+/*
+ *Implementação Esfera, com base na documentação:
+ * https://www.songho.ca/opengl/gl_sphere.html 
+ */
+static GLfloat sphereVertices[VERT_MAX][3];
+static GLfloat sphereNormals [VERT_MAX][3];
+static GLfloat sphereTex     [VERT_MAX][2];
+
+float radius = 0.48;
+int stackCount = 32;
+int sectorCount = 48;
+
+
+void buildSphere(void)
+{
+    if (stackCount > STACK_MAX)  stackCount = STACK_MAX;
+    if (sectorCount > SECTOR_MAX) sectorCount = SECTOR_MAX;
+
+    float lengthInv = 1.0 / radius;
+    float sectorStep = 2.0 * PI / (float)sectorCount;
+    float stackStep  = PI / (float)stackCount;
+
+    for (int i = 0; i <= stackCount; ++i)
+    {
+        float stackAngle = (PI * 0.5) - (float)i * stackStep;
+        float xy = radius * cosf(stackAngle);
+        float z  = radius * sinf(stackAngle);
+
+        for (int j = 0; j <= sectorCount; ++j)
+        {
+            float sectorAngle = (float)j * sectorStep;
+
+            float x = xy * cosf(sectorAngle);
+            float y = xy * sinf(sectorAngle);
+
+            int idx = i * (sectorCount + 1) + j;   /* usa o count real */
+
+            sphereVertices[idx][0] = x;
+            sphereVertices[idx][1] = y;
+            sphereVertices[idx][2] = z;
+
+            sphereNormals[idx][0] = x * lengthInv;
+            sphereNormals[idx][1] = y * lengthInv;
+            sphereNormals[idx][2] = z * lengthInv;
+
+            sphereTex[idx][0] = (float)j / (float)sectorCount;
+            sphereTex[idx][1] = (float)i / (float)stackCount;
+        }
+    }
 }
