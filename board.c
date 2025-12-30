@@ -14,6 +14,8 @@
 #define W 500
 #define H 500
 
+#define PI 3.14159
+
 struct board {
     Map* maps;
     int mapsCount;
@@ -26,6 +28,9 @@ struct board {
 static GLfloat camX = 0.0;
 static GLfloat camY = 0.0;
 static GLfloat camZ = 12.0;
+
+static GLfloat camPitch = 0.0;  
+static GLfloat camYaw = 0.0;   
 
 static GLfloat centerX = 0.0;
 static GLfloat centerY = 0.0;
@@ -168,11 +173,27 @@ void boardDisplay(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glTranslatef(0.0, 0.0, -camZ);
-    glTranslatef(-camX, -camY, 0.0);
+    if (gBoard && gBoard->mapsCount > 0) {
+        Map m = gBoard->maps[gBoard->currentMap];
 
-    if (gBoard && gBoard->mapsCount > 0)
-        drawMap(gBoard->maps[gBoard->currentMap]);
+        int cols = mapXSize(m);
+        int rows = mapYSize(m);
+
+        if (cols > 0 && rows > 0) {
+            centerX = (GLfloat)(cols - 1);
+            centerY = (GLfloat)(rows - 1);
+        }
+
+        glTranslatef(0.0, 0.0, -camZ);
+         
+        glRotatef(camPitch, 1.0, 0.0, 0.0);
+         
+        glRotatef(camYaw, 0.0, 0.0, 1.0);
+
+        glTranslatef(-camX, -camY, 0.0);
+
+        drawMap(m);
+    }
 
     characterDraw();
 
@@ -186,6 +207,7 @@ void boardKey(unsigned char key, int x, int y)
 
     const GLfloat pan = 0.3;
     const GLfloat zoom = 0.7;
+    const GLfloat rotStep = 2.0;
 
     if (key == 'x' && camX <= maxX) camX += pan;
     if (key == 'X' && camX >= minX) camX -= pan;
@@ -195,11 +217,19 @@ void boardKey(unsigned char key, int x, int y)
 
     if (key == 'Z') { camZ -= zoom; if (camZ < 2.0) camZ = 2.0; }
     if (key == 'z') camZ += zoom;
+     
+    if (key == 'k') camPitch += rotStep;
+    if (key == 'K') camPitch -= rotStep;
+     
+    if (key == 'j') camYaw += rotStep;
+    if (key == 'J') camYaw -= rotStep;
 
     if (key == 'r' || key == 'R') {
         camX = 0.0;
         camY = 0.0;
         camZ = 12.0;
+        camPitch = 0.0;
+        camYaw = 0.0;
     }
 
     if (key == 'n' || key == 'N') {

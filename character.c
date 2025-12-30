@@ -1,5 +1,5 @@
 #ifdef __APPLE__
-#include <GLUT/glut.h>
+#include <GLUT/glut. h>
 #else
 #include <GL/glut.h>
 #endif
@@ -10,6 +10,9 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <math.h>
 
 #define PI 3.14159f
@@ -23,10 +26,24 @@ struct pacman {
     int alive;
 };
 
+typedef struct {
+    int c;
+    int r;
+} HousePos;
+
 static struct pacman pacData = { 0, 0, 0 };
 static Pacman pac = &pacData;
+
 float mouthAngleDeg = 10.0;
 int mouthOpening = 1;
+
+static GLfloat sphereVertices[VERT_MAX][3];
+static GLfloat sphereNormals[VERT_MAX][3];
+static GLfloat sphereTex[VERT_MAX][2];
+
+float radius = 0.48;
+int stackCount = 32;
+int sectorCount = 48;
 
 static GLfloat vertices[][3] = {
     {-1.0,-1.0,-0.1},{ 1.0,-1.0,-0.1},
@@ -52,19 +69,12 @@ static void polygon(int a, int b, int c, int d)
     glEnd();
 }
 
-void timer(int v)
-{
-    updateMouth();
-    glutPostRedisplay();
-    glutTimerFunc(16, timer, 0);
-}
-
 void updateMouth(void)
 {
-    if (mouthOpening){
+    if (mouthOpening) {
         mouthAngleDeg += 1.0;
     }
-    else{
+    else {
         mouthAngleDeg -= 1.0;
     }
 
@@ -72,22 +82,33 @@ void updateMouth(void)
     if (mouthAngleDeg < 5.0)  mouthOpening = 1;
 }
 
+void timer(int v)
+{
+    updateMouth();
+    glutPostRedisplay();
+    glutTimerFunc(16, timer, 0);
+}
 
+static void drawEye(void)
+{
+    glColor3f(0.0, 0.0, 0.0);
+    glutSolidSphere(0.08, 16, 16);
+}
 
 static void drawPacman(void)
 {
-   glColor3f(1.0f, 1.0f, 0.0f);
- 
+    glColor3f(1.0, 1.0, 0.0);
+
     int cut = (int)((mouthAngleDeg / 360.0) * (float)sectorCount);
     if (cut < 0) cut = 0;
     if (cut > sectorCount / 2) cut = sectorCount / 2;
- 
+
     for (int i = 0; i < stackCount; ++i)
     {
-        glBegin(GL_QUAD_STRIP); 
+        glBegin(GL_QUAD_STRIP);
         for (int j = 0; j <= sectorCount; ++j)
-        { 
-            if (j <= cut || j >= (sectorCount - cut)){
+        {
+            if (j <= cut || j >= (sectorCount - cut)) {
                 continue;
             }
 
@@ -105,12 +126,17 @@ static void drawPacman(void)
 
         glEnd();
     }
-}
 
-typedef struct {
-    int c;
-    int r;
-} HousePos;
+    glPushMatrix();
+    glTranslatef(0.15, 0.40, -0.15);
+    drawEye();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.15, 0.40, 0.15);
+    drawEye();
+    glPopMatrix();
+}
 
 static int collectHouses(Map m, HousePos* houses, int max)
 {
@@ -144,8 +170,52 @@ int getPacmanCol(Pacman p)
     return p ? p->c : -1;
 }
 
+void buildSphere(void)
+{
+    if (stackCount > STACK_MAX)  stackCount = STACK_MAX;
+    if (sectorCount > SECTOR_MAX) sectorCount = SECTOR_MAX;
+
+    float lengthInv = 1.0 / radius;
+    float sectorStep = 2.0 * PI / (float)sectorCount;
+    float stackStep = PI / (float)stackCount;
+
+    for (int i = 0; i <= stackCount; ++i)
+    {
+        float stackAngle = (PI * 0.5) - (float)i * stackStep;
+        float xy = radius * cosf(stackAngle);
+        float z = radius * sinf(stackAngle);
+
+        for (int j = 0; j <= sectorCount; ++j)
+        {
+            float sectorAngle = (float)j * sectorStep;
+
+            float x = xy * cosf(sectorAngle);
+            float y = xy * sinf(sectorAngle);
+
+            int idx = i * (sectorCount + 1) + j;
+
+            sphereVertices[idx][0] = x;
+            sphereVertices[idx][1] = y;
+            sphereVertices[idx][2] = z;
+
+            sphereNormals[idx][0] = x * lengthInv;
+            sphereNormals[idx][1] = y * lengthInv;
+            sphereNormals[idx][2] = z * lengthInv;
+
+            sphereTex[idx][0] = (float)j / (float)sectorCount;
+            sphereTex[idx][1] = (float)i / (float)stackCount;
+        }
+    }
+}
+
 void characterInit(void)
 {
+    static int sphereBuilt = 0;
+    if (!sphereBuilt) {
+        buildSphere();
+        sphereBuilt = 1;
+    }
+
     Map m = getCurrentMap();
     if (!m) return;
 
@@ -197,8 +267,10 @@ void characterDraw(void)
     glScalef(s, s, s);
     glTranslatef(-(GLfloat)(cols - 1), -(GLfloat)(rows - 1), 0.0);
 
-    glTranslatef((GLfloat)(p->c * 2), (GLfloat)(rr * 2), 0.6);
-    glScalef(0.6, 0.6, 0.6);
+    glTranslatef((GLfloat)(p->c * 2), (GLfloat)(rr * 2), 1.0);
+    glScalef(1.6, 1.6, 1.6);
+
+    glRotatef(90.0, 1.0, 0.0, 0.0);
 
     drawPacman();
 
@@ -229,61 +301,9 @@ int characterMove(unsigned char key)
     Cell next = cellAt(m, nr, nc);
     if (!next) return 0;
     if (!cellIsWall(next)) return 0;
-    
+
     p->c = nc;
     p->r = nr;
 
     return 1;
-}
-
-
-/*
- *Implementação Esfera, com base na documentação:
- * https://www.songho.ca/opengl/gl_sphere.html 
- */
-static GLfloat sphereVertices[VERT_MAX][3];
-static GLfloat sphereNormals [VERT_MAX][3];
-static GLfloat sphereTex     [VERT_MAX][2];
-
-float radius = 0.48;
-int stackCount = 32;
-int sectorCount = 48;
-
-
-void buildSphere(void)
-{
-    if (stackCount > STACK_MAX)  stackCount = STACK_MAX;
-    if (sectorCount > SECTOR_MAX) sectorCount = SECTOR_MAX;
-
-    float lengthInv = 1.0 / radius;
-    float sectorStep = 2.0 * PI / (float)sectorCount;
-    float stackStep  = PI / (float)stackCount;
-
-    for (int i = 0; i <= stackCount; ++i)
-    {
-        float stackAngle = (PI * 0.5) - (float)i * stackStep;
-        float xy = radius * cosf(stackAngle);
-        float z  = radius * sinf(stackAngle);
-
-        for (int j = 0; j <= sectorCount; ++j)
-        {
-            float sectorAngle = (float)j * sectorStep;
-
-            float x = xy * cosf(sectorAngle);
-            float y = xy * sinf(sectorAngle);
-
-            int idx = i * (sectorCount + 1) + j;   /* usa o count real */
-
-            sphereVertices[idx][0] = x;
-            sphereVertices[idx][1] = y;
-            sphereVertices[idx][2] = z;
-
-            sphereNormals[idx][0] = x * lengthInv;
-            sphereNormals[idx][1] = y * lengthInv;
-            sphereNormals[idx][2] = z * lengthInv;
-
-            sphereTex[idx][0] = (float)j / (float)sectorCount;
-            sphereTex[idx][1] = (float)i / (float)stackCount;
-        }
-    }
 }
