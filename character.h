@@ -2,6 +2,7 @@
 #define CHARACTER_H
 
 typedef struct pacman* Pacman;
+typedef struct ghost* Ghost;
 
 void characterInit(void);
 void characterDraw(void);

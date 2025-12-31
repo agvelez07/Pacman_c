@@ -1,38 +1,43 @@
 ﻿  board.c
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(99,18): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(99,42): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(99,66): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(113,22): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(113,27): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(113,32): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(115,23): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(115,28): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(115,33): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(208,25): warning C4305: 'initializing': truncation from 'double' to 'const GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(209,26): warning C4305: 'initializing': truncation from 'double' to 'const GLfloat'
   character.c
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(44,16): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(49,16): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(49,33): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(50,16): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(50,33): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(51,17): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(51,34): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(52,17): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(52,34): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(131,18): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(131,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(131,30): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(136,18): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(136,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(136,30): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(178,27): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(179,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(184,39): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(271,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(271,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(271,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(261,21): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(130,18): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(130,42): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(130,66): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(144,22): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(144,27): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(144,32): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(146,23): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(146,28): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(146,33): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(239,25): warning C4305: 'initializing': truncation from 'double' to 'const GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\board.c(240,26): warning C4305: 'initializing': truncation from 'double' to 'const GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(51,16): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(56,16): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(56,33): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(57,16): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(57,33): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(58,17): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(58,34): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(59,17): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(59,34): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(138,18): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(138,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(138,30): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(143,18): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(143,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(143,30): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(185,27): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(186,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(191,39): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(288,44): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(290,45): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(291,45): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(292,45): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(297,40): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(336,14): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(336,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(336,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\character.c(326,21): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
   cube.c
 C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\cube.c(10,16): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
 C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\cube.c(10,33): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
@@ -46,6 +51,6 @@ C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\cube.c(13
   pm-maps.c
   Generating code
   Previous IPDB not found, fall back to full compilation.
-  All 39 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 42 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   Figura2D.vcxproj -> C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\Release\pacman.exe

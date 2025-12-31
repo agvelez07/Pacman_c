@@ -23,6 +23,7 @@ struct board {
     int wallMode;
     int gameStatus;
     Pacman pacman;
+	Ghost* ghosts;
 };
 
 static GLfloat camX = 0.0;
@@ -74,6 +75,36 @@ int setBoardPacman(Pacman p)
     gBoard->pacman = p;
     return 1;
 }
+
+void ClearGhosts() {
+    if (!gBoard || !gBoard->ghosts) return;
+    int ghostCount = getBoardGhostCount(getCurrentMap());
+    for (int i = 0; i < ghostCount; i++) {
+        if (gBoard->ghosts[i]) {
+            free(gBoard->ghosts[i]);
+            gBoard->ghosts[i] = NULL;
+        }
+    }
+    free(gBoard->ghosts);
+    gBoard->ghosts = NULL;
+}
+
+int setBoardGhosts(Ghost* ghosts, int ghostCount)
+{
+    if (!gBoard) return 0;
+
+    ClearGhosts();
+
+    if (!ghosts || ghostCount <= 0) {
+        return 1; 
+    }
+
+    gBoard->ghosts = ghosts;
+
+
+    return 1;
+}
+
 
 static void drawMap(Map m)
 {

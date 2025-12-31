@@ -15,8 +15,11 @@ Map getCurrentMap(void);
 int getBoardMapCount(void);
 int getCurrentMapIndex(void);
 
+
 Pacman getPacman(void);
 int setBoardPacman(Pacman p);
+int setBoardGhosts(Ghost* ghosts, int ghostCount);
+
 
 void boardDisplay(void);
 void boardReshape(int w, int h);

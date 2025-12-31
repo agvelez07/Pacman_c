@@ -26,13 +26,20 @@ struct pacman {
     int alive;
 };
 
+struct ghost {
+    int c;
+    int r;
+    float speed;
+	float colorR, colorG, colorB;
+};
+
+
 typedef struct {
     int c;
     int r;
 } HousePos;
 
-static struct pacman pacData = { 0, 0, 0 };
-static Pacman pac = &pacData;
+
 
 float mouthAngleDeg = 10.0;
 int mouthOpening = 1;
@@ -210,6 +217,9 @@ void buildSphere(void)
 
 void characterInit(void)
 {
+    static struct pacman pacData = { 0, 0, 0 };
+    static Pacman pac = &pacData;
+
     static int sphereBuilt = 0;
     if (!sphereBuilt) {
         buildSphere();
@@ -240,6 +250,61 @@ void characterInit(void)
         pac->r = houses[k].r;
         pac->alive = 1;
         setBoardPacman(pac);
+    }
+
+    int ghostCount = getBoardGhostCount(m);
+    if (ghostCount > 0) {
+
+        Ghost* ghostArray = (Ghost*)malloc((size_t)ghostCount * sizeof(Ghost));
+        if (!ghostArray) { free(houses); return; }
+         
+        for (int i = 0; i < ghostCount; i++) ghostArray[i] = NULL;
+
+        for (int i = 0; i < ghostCount; i++) {
+
+            ghostArray[i] = (Ghost)malloc(sizeof(struct ghost));
+            if (!ghostArray[i]) { 
+                for (int j = 0; j < i; j++) free(ghostArray[j]);
+                free(ghostArray);
+                free(houses);
+                return;
+            }
+
+            HousePos* housesGhost = (HousePos*)malloc((size_t)max * sizeof(HousePos));
+            if (!housesGhost) {
+                for (int j = 0; j <= i; j++) free(ghostArray[j]);
+                free(ghostArray);
+                free(houses);
+                return;
+            }
+
+            int countG = collectHouses(m, housesGhost, max);
+            if (countG > 0) {
+                int k = rand() % countG;
+
+                ghostArray[i]->c = housesGhost[k].c;
+                ghostArray[i]->r = housesGhost[k].r;
+                 
+                ghostArray[i]->speed = 0.7 + ((float)rand() / (float)RAND_MAX) * 0.5;
+                 
+                ghostArray[i]->colorR = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
+                ghostArray[i]->colorG = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
+                ghostArray[i]->colorB = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
+            }
+            else { 
+                ghostArray[i]->c = 0;
+                ghostArray[i]->r = 0;
+                ghostArray[i]->speed = 0.7;
+                ghostArray[i]->colorR = 1.0;
+                ghostArray[i]->colorG = 0.0;
+                ghostArray[i]->colorB = 1.0;
+            }
+
+            free(housesGhost);
+        }
+
+        setBoardGhosts(ghostArray, ghostCount);
+
     }
 
     free(houses);

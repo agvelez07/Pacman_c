@@ -52,6 +52,10 @@ Map mapCreate(void)
     return m;
 }
 
+int getBoardGhostCount(Map m) {
+    return m ? m->ghostCount : 0;
+}
+
 void deleteMap(Map m)
 {
     if (!m) return;
@@ -68,6 +72,47 @@ void deleteMap(Map m)
     m->xSize = 0;
     m->ySize = 0;
     m->ghostCount = 0;
+}
+
+int getvisitedCell(Cell c)
+{
+    return c ? c->visited : 0;
+}
+
+
+Cell getCellByCR(Map m, int c, int r)
+{
+    if (!m || !m->cells) return NULL;
+
+    int maxCells = m->xSize * m->ySize;   
+
+    for (int i = 0; i < maxCells; i++) {
+        if (!m->cells[i]) break;   
+
+        if (m->cells[i]->c == c && m->cells[i]->r == r) {
+            return m->cells[i];
+        }
+    }
+
+    return NULL;
+}
+
+int setCellOcuppied(Map m, int c, int r)
+{
+	if (!m) return 0;
+	Cell cell = getCellByCR(m, c, r);
+	if (!cell) return 0;
+	cell->occupied = 1;
+    return 1;
+}
+
+int setCellNotOcuppied(Map m, int c, int r)
+{
+    if (!m) return 0;
+    Cell cell = getCellByCR(m, c, r);
+    if (!cell) return 0;
+    cell->occupied = 0;
+    return 1;
 }
 
 void mapDestroy(Map m)
