@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-#include <string.h>
+#include <string.h>nextKey
 #include <math.h>
 
 #define PI 3.14159
@@ -25,6 +25,8 @@ struct pacman {
     int nC;
     int nR;
     int alive;
+	char currentKey;
+	char nextKey;
     float t;
     int moving;
 };
@@ -112,6 +114,22 @@ static void drawEye(void)
     glColor3f(0.0, 0.0, 0.0);
     glutSolidSphere(0.08, 16, 16);
 }
+
+int setPacmanNextKey(char key)
+{
+    Pacman p = getPacman();
+    if (!p) return 0;
+    p->nextKey = key;
+    return 1;
+}
+
+int pacmanChangedKey() {
+    Pacman p = getPacman();
+    if (!p) return -1;
+    if (p->currentKey != p->nextKey) return 1;
+    return 0;
+}
+
 
 static void drawPacman(void)
 {
@@ -261,6 +279,8 @@ void characterInit(void)
         pac->nR = pac->r;
         pac->t = 0.0;
         pac->moving = 0;
+		pac->nextKey = NULL;
+		pac->currentKey = NULL;
         setBoardPacman(pac);
     }
 
@@ -392,6 +412,22 @@ void ghostsDraw(Ghost* ghosts)
     }
 }
 
+int isPacmanAlive()
+{
+    Pacman p = getPacman();
+    if (!p) return 0;
+    return p->alive;
+}
+
+int pacmanDie()
+{
+    Pacman p = getPacman();
+    if (!p) return 0;
+    p->alive = 0;
+    return 1;
+}
+
+
 void characterDraw(void)
 {
     Map m = getCurrentMap();
@@ -427,10 +463,36 @@ void characterDraw(void)
 
     glRotatef(90.0, 1.0, 0.0, 0.0);
 
+    switch (p->currentKey) {
+    case 'd': 
+        break;
+
+    case 'w': 
+        glRotatef(90.0, 0.0, 1.0, 0.0);
+        break;
+
+    case 'a':  
+        glRotatef(180.0, 0.0, 1.0, 0.0);
+        break;
+
+    case 's':  
+        glRotatef(270.0, 0.0, 1.0, 0.0);
+        break;
+    }
+
     drawPacman();
 
     glPopMatrix();
 }
+
+int setPacmanCurrentKey()
+{
+    Pacman p = getPacman();
+    if (!p->nextKey) return 0;
+    p->currentKey = p->nextKey;
+    return 1;
+}
+
 
 int characterMove(unsigned char key)
 {
@@ -445,10 +507,34 @@ int characterMove(unsigned char key)
     int dc = 0;
     int dr = 0;
 
-    if (key == 'w' || key == 'W') dr = -1;
-    if (key == 's' || key == 'S') dr = 1;
-    if (key == 'd' || key == 'D') dc = 1;
-    if (key == 'a' || key == 'A') dc = -1;
+    if (key == 'w' || key == 'W') {
+        dr = -1; 
+        if (key != p->currentKey) {  
+            setPacmanNextKey('w');
+            setPacmanCurrentKey();   
+        }
+    }
+    if (key == 's' || key == 'S'){ 
+        dr = 1; 
+        if (key != p->currentKey) {
+            setPacmanNextKey('s');
+            setPacmanCurrentKey();
+        }
+    }
+    if (key == 'd' || key == 'D') {
+        dc = 1; 
+        if (key != p->currentKey) {
+            setPacmanNextKey('d');
+            setPacmanCurrentKey();
+        }
+    }
+    if (key == 'a' || key == 'A') {
+        dc = -1; 
+        if (key != p->currentKey) {
+            setPacmanNextKey('a');
+            setPacmanCurrentKey();
+        }
+    }
 
     if (dc == 0 && dr == 0) return 0;
 
