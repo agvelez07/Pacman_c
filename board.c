@@ -29,7 +29,7 @@ struct board {
 
 static GLfloat camX = 0.0;
 static GLfloat camY = 0.0;
-static GLfloat camZ = 12.0;
+static GLfloat camZ = 3.0;
 
 static GLfloat camPitch = 0.0;  
 static GLfloat camYaw = 0.0;   
@@ -92,6 +92,7 @@ int setBoardGhostCount(int ghostsCount)
 void ClearGhosts() {
     if (!gBoard || !gBoard->ghosts) return;
     int ghostCount = getBoardGhostCount();
+    if (ghostCount <= 0) return;
     for (int i = 0; i < ghostCount; i++) {
         if (gBoard->ghosts[i]) {
             free(gBoard->ghosts[i]);
@@ -208,6 +209,7 @@ void boardInit(const char* mapFile)
     gBoard->gameStatus = 0;
     gBoard->pacman = NULL;
 	gBoard->ghostCount = 0;
+    gBoard->ghosts = NULL;
 
     gBoard->mapsCount = readAllMaps(&gBoard->maps, mapFile);
     if (gBoard->mapsCount <= 0) exit(1);

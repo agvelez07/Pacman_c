@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define PI 3.14159f
+#define PI 3.14159
 #define STACK_MAX  64
 #define SECTOR_MAX 64
 #define VERT_MAX ((STACK_MAX + 1) * (SECTOR_MAX + 1))
@@ -33,13 +33,10 @@ struct ghost {
 	float colorR, colorG, colorB;
 };
 
-
 typedef struct {
     int c;
     int r;
 } HousePos;
-
-
 
 float mouthAngleDeg = 10.0;
 int mouthOpening = 1;
@@ -313,44 +310,31 @@ void characterInit(void)
 static void drawSingleGhost(Ghost g)
 {
  
-    glColor3f(1.0, 1.0, 0.0);
+    glColor3f(g->colorR, g->colorG, g->colorB);  
+    glutSolidCube(1.0);
 
-    int cut = (int)((mouthAngleDeg / 360.0) * (float)sectorCount);
-    if (cut < 0) cut = 0;
-    if (cut > sectorCount / 2) cut = sectorCount / 2;
-
-    for (int i = 0; i < stackCount; ++i)
-    {
-        glBegin(GL_QUAD_STRIP);
-        for (int j = 0; j <= sectorCount; ++j)
-        {
-            if (j <= cut || j >= (sectorCount - cut)) {
-                continue;
-            }
-
-            int k1 = i * (sectorCount + 1) + j;
-            int k2 = (i + 1) * (sectorCount + 1) + j;
-
-            if (k2 >= VERT_MAX) continue;
-
-            glNormal3fv(sphereNormals[k1]);
-            glVertex3fv(sphereVertices[k1]);
-
-            glNormal3fv(sphereNormals[k2]);
-            glVertex3fv(sphereVertices[k2]);
-        }
-
-        glEnd();
-    }
-
+    // Olhos brancos
+    glColor3f(1.0, 1.0, 1.0);
     glPushMatrix();
-    glTranslatef(0.15, 0.40, -0.15);
-    drawEye();
+    glTranslatef(-0.2, 0.2, 0.55);
+    glutSolidSphere(0.15, 16, 16);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0.15, 0.40, 0.15);
-    drawEye();
+    glTranslatef(0.2, 0.2, 0.55);
+    glutSolidSphere(0.15, 16, 16);
+    glPopMatrix();
+
+    // Pupilas pretas
+    glColor3f(0.0, 0.0, 0.0);
+    glPushMatrix();
+    glTranslatef(-0.2, 0.2, 0.65);
+    glutSolidSphere(0.08, 16, 16);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.2, 0.2, 0.65);
+    glutSolidSphere(0.08, 16, 16);
     glPopMatrix();
 }
 
@@ -426,8 +410,7 @@ void characterDraw(void)
     glPopMatrix();
 }
 
-int characterMove(unsigned char key)
-{
+int characterMove(unsigned char key){
     Map m = getCurrentMap();
     if (!m) return 0;
 
@@ -444,15 +427,64 @@ int characterMove(unsigned char key)
 
     if (dc == 0 && dr == 0) return 0;
 
-    int nc = p->c + dc;
-    int nr = p->r + dr;
+    int iC = p->c;
+    int iR = p->r;
 
-    Cell next = cellAt(m, nr, nc);
+    int fC = iC + dc;
+    int fR = iR + dr;
+
+    Cell next = cellAt(m, fR, fC);
     if (!next) return 0;
-    if (!cellIsWall(next)) return 0;
+    //if (!cellIsWall(next)) return 0;
 
-    p->c = nc;
-    p->r = nr;
+    int mov = 1;
+    for (float t = 0; t < 1; t += 0.1) {
+        t = 1;
+        float x = iC + t * fC;
+        float z = iR + t * fR;
+
+		glPushMatrix();
+        glTranslatef(x, 20.0, z);
+        drawPacman();
+		glPopMatrix();
+    }
+
+
+	//printf("Moving to (%d, %d)\n", n, nc);
+
+    //p->c = nc;
+    //p->r = nr;
 
     return 1;
 }
+
+//int characterMove(unsigned char key)
+//{
+//    Map m = getCurrentMap();
+//    if (!m) return 0;
+//
+//    Pacman p = getPacman();
+//    if (!p || p->alive != 1) return 0;
+//
+//    int dc = 0;
+//    int dr = 0;
+//
+//    if (key == 'w' || key == 'W') dr = -1;
+//    if (key == 's' || key == 'S') dr = 1;
+//    if (key == 'd' || key == 'D') dc = 1;
+//    if (key == 'a' || key == 'A') dc = -1;
+//
+//    if (dc == 0 && dr == 0) return 0;
+//
+//    int nc = p->c + dc;
+//    int nr = p->r + dr;
+//
+//    Cell next = cellAt(m, nr, nc);
+//    if (!next) return 0;
+//    if (!cellIsWall(next)) return 0;
+//
+//    p->c = nc;
+//    p->r = nr;
+//
+//    return 1;
+//}
