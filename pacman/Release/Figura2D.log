@@ -66,6 +66,6 @@ C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\cube.c(20
 C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\pm-maps.c(177,5): warning C4013: 'setBoardGhostCount' undefined; assuming extern returning int
   Generating code
   Previous IPDB not found, fall back to full compilation.
-  All 60 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 61 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   Figura2D.vcxproj -> C:\Users\vitam\Desktop\Eng. Informatica\25-26\CompGraf\pacman-basecode\Release\pacman.exe

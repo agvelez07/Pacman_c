@@ -257,7 +257,7 @@ void boardDisplay(void)
     glutSwapBuffers();
 }
 
-void boardKey(unsigned char key, int x, int y)
+void boardKey(unsigned char key, int x, int y) 
 {
     (void)x;
     (void)y;
@@ -274,10 +274,10 @@ void boardKey(unsigned char key, int x, int y)
 
     if (key == 'Z') { camZ -= zoom; if (camZ < 2.0) camZ = 2.0; }
     if (key == 'z') camZ += zoom;
-     
+
     if (key == 'k') camPitch += rotStep;
     if (key == 'K') camPitch -= rotStep;
-     
+
     if (key == 'j') camYaw += rotStep;
     if (key == 'J') camYaw -= rotStep;
 
@@ -288,19 +288,29 @@ void boardKey(unsigned char key, int x, int y)
     if (key == 'n' || key == 'N') {
         if (gBoard && gBoard->mapsCount > 0) {
             gBoard->currentMap = (gBoard->currentMap + 1) % gBoard->mapsCount;
-            characterInit();
+            restartGame();  
         }
     }
-
+     
     if (key == 'w' || key == 'W' ||
         key == 'a' || key == 'A' ||
         key == 's' || key == 'S' ||
         key == 'd' || key == 'D')
     {
-        characterMove(key);
+        characterMove((int)key);
     }
 
     if (key == 27) exit(0);
+
+    glutPostRedisplay();
+}
+ 
+void boardSpecialKey(int key, int x, int y)
+{
+    (void)x;
+    (void)y;
+
+    characterMove(key);   
 
     glutPostRedisplay();
 }

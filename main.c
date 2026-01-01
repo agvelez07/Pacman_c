@@ -33,7 +33,8 @@ int main(int argc, char** argv)
 
     glutDisplayFunc(boardDisplay);
     glutReshapeFunc(boardReshape);
-    glutKeyboardFunc(boardKey);
+    glutKeyboardFunc(boardKey);      
+    glutSpecialFunc(boardSpecialKey);
 
     glutMainLoop();
     return 0;

@@ -25,8 +25,8 @@ struct pacman {
     int nC;
     int nR;
     int alive;
-    char currentKey;
-    char nextKey;
+    int currentKey;
+    int nextKey;
     float t;
     int moving;
 };
@@ -267,7 +267,7 @@ static void drawEye(void)
     glutSolidSphere(0.08, 16, 16);
 }
 
-int setPacmanNextKey(char key)
+int setPacmanNextKey(int key)
 {
     Pacman p = getPacman();
     if (!p) return 0;
@@ -684,7 +684,7 @@ int setPacmanCurrentKey(void)
     return 1;
 }
 
-int characterMove(unsigned char key)
+int characterMove(int key)
 {
     Map m = getCurrentMap();
     if (!m) return 0;
@@ -696,31 +696,60 @@ int characterMove(unsigned char key)
 
     int dc = 0;
     int dr = 0;
-
-    if (key == 'w' || key == 'W') {
+ 
+    if (key == GLUT_KEY_UP) {
         dr = -1;
-        if (key != p->currentKey) {
+        if ('w' != p->currentKey) {
             setPacmanNextKey('w');
             setPacmanCurrentKey();
         }
     }
-    if (key == 's' || key == 'S') {
+    else if (key == GLUT_KEY_DOWN) {
         dr = 1;
-        if (key != p->currentKey) {
+        if ('s' != p->currentKey) {
             setPacmanNextKey('s');
             setPacmanCurrentKey();
         }
     }
-    if (key == 'd' || key == 'D') {
+    else if (key == GLUT_KEY_RIGHT) {
         dc = 1;
-        if (key != p->currentKey) {
+        if ('d' != p->currentKey) {
             setPacmanNextKey('d');
             setPacmanCurrentKey();
         }
     }
-    if (key == 'a' || key == 'A') {
+    else if (key == GLUT_KEY_LEFT) {
         dc = -1;
-        if (key != p->currentKey) {
+        if ('a' != p->currentKey) {
+            setPacmanNextKey('a');
+            setPacmanCurrentKey();
+        }
+    }
+ 
+    else if (key == 'w' || key == 'W') {
+        dr = -1;
+        if ('w' != p->currentKey) {
+            setPacmanNextKey('w');
+            setPacmanCurrentKey();
+        }
+    }
+    else if (key == 's' || key == 'S') {
+        dr = 1;
+        if ('s' != p->currentKey) {
+            setPacmanNextKey('s');
+            setPacmanCurrentKey();
+        }
+    }
+    else if (key == 'd' || key == 'D') {
+        dc = 1;
+        if ('d' != p->currentKey) {
+            setPacmanNextKey('d');
+            setPacmanCurrentKey();
+        }
+    }
+    else if (key == 'a' || key == 'A') {
+        dc = -1;
+        if ('a' != p->currentKey) {
             setPacmanNextKey('a');
             setPacmanCurrentKey();
         }

@@ -25,6 +25,7 @@ int setBoardGhostCount(int ghostsCount);
 
 void boardDisplay(void);
 void boardReshape(int w, int h);
-void boardKey(unsigned char key, int x, int y);
+void boardKey(unsigned char key, int x, int y);   
+void boardSpecialKey(int key, int x, int y);
 
 #endif

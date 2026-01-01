@@ -8,7 +8,7 @@ void ghostsDraw(Ghost* ghost);
 
 void characterInit(void);
 void characterDraw(void);
-int characterMove(unsigned char key);
+int characterMove(int key);
 
 void updateMouth(void);
 void timer(int v);
