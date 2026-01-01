@@ -1,5 +1,5 @@
 #ifdef __APPLE__
-#include <GLUT/glut. h>
+#include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
@@ -12,7 +12,6 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <math.h>
 
 #define PI 3.14159
@@ -23,14 +22,20 @@
 struct pacman {
     int c;
     int r;
+    int nC;
+    int nR;
     int alive;
+    float t;
+    int moving;
 };
 
 struct ghost {
     int c;
     int r;
-    float speed;
-	float colorR, colorG, colorB;
+    int nC;
+    int nR;
+    float t;
+    float colorR, colorG, colorB;
 };
 
 typedef struct {
@@ -75,12 +80,8 @@ static void polygon(int a, int b, int c, int d)
 
 void updateMouth(void)
 {
-    if (mouthOpening) {
-        mouthAngleDeg += 1.0;
-    }
-    else {
-        mouthAngleDeg -= 1.0;
-    }
+    if (mouthOpening) mouthAngleDeg += 1.0;
+    else mouthAngleDeg -= 1.0;
 
     if (mouthAngleDeg > 40.0) mouthOpening = 0;
     if (mouthAngleDeg < 5.0)  mouthOpening = 1;
@@ -89,6 +90,19 @@ void updateMouth(void)
 void timer(int v)
 {
     updateMouth();
+
+    Pacman p = getPacman();
+    if (p && p->alive == 1 && p->moving) {
+        p->t += 0.05;
+        if (p->t >= 1.0) {
+            p->t = 1.0;
+            p->c = p->nC;
+            p->r = p->nR;
+            p->moving = 0;
+            p->t = 0.0;
+        }
+    }
+
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
 }
@@ -112,9 +126,7 @@ static void drawPacman(void)
         glBegin(GL_QUAD_STRIP);
         for (int j = 0; j <= sectorCount; ++j)
         {
-            if (j <= cut || j >= (sectorCount - cut)) {
-                continue;
-            }
+            if (j <= cut || j >= (sectorCount - cut)) continue;
 
             int k1 = i * (sectorCount + 1) + j;
             int k2 = (i + 1) * (sectorCount + 1) + j;
@@ -127,7 +139,6 @@ static void drawPacman(void)
             glNormal3fv(sphereNormals[k2]);
             glVertex3fv(sphereVertices[k2]);
         }
-
         glEnd();
     }
 
@@ -214,7 +225,7 @@ void buildSphere(void)
 
 void characterInit(void)
 {
-    static struct pacman pacData = { 0, 0, 0 };
+    static struct pacman pacData = { 0, 0, 0, 0, 0, 0.0, 0 };
     static Pacman pac = &pacData;
 
     static int sphereBuilt = 0;
@@ -246,6 +257,10 @@ void characterInit(void)
         pac->c = houses[k].c;
         pac->r = houses[k].r;
         pac->alive = 1;
+        pac->nC = pac->c;
+        pac->nR = pac->r;
+        pac->t = 0.0;
+        pac->moving = 0;
         setBoardPacman(pac);
     }
 
@@ -254,13 +269,13 @@ void characterInit(void)
 
         Ghost* ghostArray = (Ghost*)malloc((size_t)ghostCount * sizeof(Ghost));
         if (!ghostArray) { free(houses); return; }
-         
+
         for (int i = 0; i < ghostCount; i++) ghostArray[i] = NULL;
 
         for (int i = 0; i < ghostCount; i++) {
 
             ghostArray[i] = (Ghost)malloc(sizeof(struct ghost));
-            if (!ghostArray[i]) { 
+            if (!ghostArray[i]) {
                 for (int j = 0; j < i; j++) free(ghostArray[j]);
                 free(ghostArray);
                 free(houses);
@@ -281,17 +296,21 @@ void characterInit(void)
 
                 ghostArray[i]->c = housesGhost[k].c;
                 ghostArray[i]->r = housesGhost[k].r;
-                 
-                ghostArray[i]->speed = 0.7 + ((float)rand() / (float)RAND_MAX) * 0.5;
-                 
+                ghostArray[i]->nC = ghostArray[i]->c;
+                ghostArray[i]->nR = ghostArray[i]->r;
+
+                ghostArray[i]->t = 0.7 + ((float)rand() / (float)RAND_MAX) * 0.5;
+
                 ghostArray[i]->colorR = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
                 ghostArray[i]->colorG = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
                 ghostArray[i]->colorB = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
             }
-            else { 
+            else {
                 ghostArray[i]->c = 0;
                 ghostArray[i]->r = 0;
-                ghostArray[i]->speed = 0.7;
+                ghostArray[i]->nC = ghostArray[i]->c;
+                ghostArray[i]->nR = ghostArray[i]->r;
+                ghostArray[i]->t = 0.7;
                 ghostArray[i]->colorR = 1.0;
                 ghostArray[i]->colorG = 0.0;
                 ghostArray[i]->colorB = 1.0;
@@ -301,7 +320,6 @@ void characterInit(void)
         }
 
         setBoardGhosts(ghostArray, ghostCount);
-
     }
 
     free(houses);
@@ -309,11 +327,9 @@ void characterInit(void)
 
 static void drawSingleGhost(Ghost g)
 {
- 
-    glColor3f(g->colorR, g->colorG, g->colorB);  
+    glColor3f(g->colorR, g->colorG, g->colorB);
     glutSolidCube(1.0);
 
-    // Olhos brancos
     glColor3f(1.0, 1.0, 1.0);
     glPushMatrix();
     glTranslatef(-0.2, 0.2, 0.55);
@@ -325,7 +341,6 @@ static void drawSingleGhost(Ghost g)
     glutSolidSphere(0.15, 16, 16);
     glPopMatrix();
 
-    // Pupilas pretas
     glColor3f(0.0, 0.0, 0.0);
     glPushMatrix();
     glTranslatef(-0.2, 0.2, 0.65);
@@ -338,7 +353,8 @@ static void drawSingleGhost(Ghost g)
     glPopMatrix();
 }
 
-void ghostsDraw(Ghost* ghosts) {
+void ghostsDraw(Ghost* ghosts)
+{
     if (!ghosts) return;
 
     Map m = getCurrentMap();
@@ -349,7 +365,7 @@ void ghostsDraw(Ghost* ghosts) {
     int maxSize = cols > rows ? cols : rows;
     if (maxSize <= 0) return;
 
-	int ghostsCount = getBoardGhostCount();
+    int ghostsCount = getBoardGhostCount();
     if (ghostsCount <= 0) return;
 
     GLfloat s = 1.0 / (GLfloat)maxSize;
@@ -374,8 +390,6 @@ void ghostsDraw(Ghost* ghosts) {
 
         glPopMatrix();
     }
-
-
 }
 
 void characterDraw(void)
@@ -393,14 +407,22 @@ void characterDraw(void)
 
     GLfloat s = 1.0 / (GLfloat)maxSize;
 
-    int rr = (rows - 1) - p->r;
+    float drawC = (float)p->c;
+    float drawR = (float)p->r;
+
+    if (p->moving) {
+        drawC = (float)p->c + p->t * ((float)p->nC - (float)p->c);
+        drawR = (float)p->r + p->t * ((float)p->nR - (float)p->r);
+    }
+
+    float rr = (float)(rows - 1) - drawR;
 
     glPushMatrix();
 
     glScalef(s, s, s);
     glTranslatef(-(GLfloat)(cols - 1), -(GLfloat)(rows - 1), 0.0);
 
-    glTranslatef((GLfloat)(p->c * 2), (GLfloat)(rr * 2), 1.0);
+    glTranslatef((GLfloat)(drawC * 2.0), (GLfloat)(rr * 2.0), 1.0);
     glScalef(1.6, 1.6, 1.6);
 
     glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -410,12 +432,15 @@ void characterDraw(void)
     glPopMatrix();
 }
 
-int characterMove(unsigned char key){
+int characterMove(unsigned char key)
+{
     Map m = getCurrentMap();
     if (!m) return 0;
 
     Pacman p = getPacman();
     if (!p || p->alive != 1) return 0;
+
+    if (p->moving) return 0;
 
     int dc = 0;
     int dr = 0;
@@ -427,64 +452,17 @@ int characterMove(unsigned char key){
 
     if (dc == 0 && dr == 0) return 0;
 
-    int iC = p->c;
-    int iR = p->r;
+    int nc = p->c + dc;
+    int nr = p->r + dr;
 
-    int fC = iC + dc;
-    int fR = iR + dr;
-
-    Cell next = cellAt(m, fR, fC);
+    Cell next = cellAt(m, nr, nc);
     if (!next) return 0;
-    //if (!cellIsWall(next)) return 0;
+    if (!cellIsWall(next)) return 0;
 
-    int mov = 1;
-    for (float t = 0; t < 1; t += 0.1) {
-        t = 1;
-        float x = iC + t * fC;
-        float z = iR + t * fR;
-
-		glPushMatrix();
-        glTranslatef(x, 20.0, z);
-        drawPacman();
-		glPopMatrix();
-    }
-
-
-	//printf("Moving to (%d, %d)\n", n, nc);
-
-    //p->c = nc;
-    //p->r = nr;
+    p->nC = nc;
+    p->nR = nr;
+    p->t = 0.0;
+    p->moving = 1;
 
     return 1;
 }
-
-//int characterMove(unsigned char key)
-//{
-//    Map m = getCurrentMap();
-//    if (!m) return 0;
-//
-//    Pacman p = getPacman();
-//    if (!p || p->alive != 1) return 0;
-//
-//    int dc = 0;
-//    int dr = 0;
-//
-//    if (key == 'w' || key == 'W') dr = -1;
-//    if (key == 's' || key == 'S') dr = 1;
-//    if (key == 'd' || key == 'D') dc = 1;
-//    if (key == 'a' || key == 'A') dc = -1;
-//
-//    if (dc == 0 && dr == 0) return 0;
-//
-//    int nc = p->c + dc;
-//    int nr = p->r + dr;
-//
-//    Cell next = cellAt(m, nr, nc);
-//    if (!next) return 0;
-//    if (!cellIsWall(next)) return 0;
-//
-//    p->c = nc;
-//    p->r = nr;
-//
-//    return 1;
-//}
