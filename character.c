@@ -252,7 +252,7 @@ void characterInit(void)
         setBoardPacman(pac);
     }
 
-    int ghostCount = getBoardGhostCount(m);
+    int ghostCount = getBoardGhostCount();
     if (ghostCount > 0) {
 
         Ghost* ghostArray = (Ghost*)malloc((size_t)ghostCount * sizeof(Ghost));
@@ -308,6 +308,90 @@ void characterInit(void)
     }
 
     free(houses);
+}
+
+static void drawSingleGhost(Ghost g)
+{
+ 
+    glColor3f(1.0, 1.0, 0.0);
+
+    int cut = (int)((mouthAngleDeg / 360.0) * (float)sectorCount);
+    if (cut < 0) cut = 0;
+    if (cut > sectorCount / 2) cut = sectorCount / 2;
+
+    for (int i = 0; i < stackCount; ++i)
+    {
+        glBegin(GL_QUAD_STRIP);
+        for (int j = 0; j <= sectorCount; ++j)
+        {
+            if (j <= cut || j >= (sectorCount - cut)) {
+                continue;
+            }
+
+            int k1 = i * (sectorCount + 1) + j;
+            int k2 = (i + 1) * (sectorCount + 1) + j;
+
+            if (k2 >= VERT_MAX) continue;
+
+            glNormal3fv(sphereNormals[k1]);
+            glVertex3fv(sphereVertices[k1]);
+
+            glNormal3fv(sphereNormals[k2]);
+            glVertex3fv(sphereVertices[k2]);
+        }
+
+        glEnd();
+    }
+
+    glPushMatrix();
+    glTranslatef(0.15, 0.40, -0.15);
+    drawEye();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.15, 0.40, 0.15);
+    drawEye();
+    glPopMatrix();
+}
+
+void ghostsDraw(Ghost* ghosts) {
+    if (!ghosts) return;
+
+    Map m = getCurrentMap();
+    if (!m) return;
+
+    int cols = mapXSize(m);
+    int rows = mapYSize(m);
+    int maxSize = cols > rows ? cols : rows;
+    if (maxSize <= 0) return;
+
+	int ghostsCount = getBoardGhostCount();
+    if (ghostsCount <= 0) return;
+
+    GLfloat s = 1.0 / (GLfloat)maxSize;
+
+    for (int i = 0; i < ghostsCount; i++) {
+
+        int rr = (rows - 1) - ghosts[i]->r;
+
+        glPushMatrix();
+
+        glScalef(s, s, s);
+        glTranslatef(-(GLfloat)(cols - 1), -(GLfloat)(rows - 1), 0.0);
+
+        glTranslatef((GLfloat)(ghosts[i]->c * 2), (GLfloat)(rr * 2), 1.0);
+        glScalef(1.6, 1.6, 1.6);
+
+        glRotatef(90.0, 1.0, 0.0, 0.0);
+
+        glColor3f(ghosts[i]->colorR, ghosts[i]->colorG, ghosts[i]->colorB);
+
+        drawSingleGhost(ghosts[i]);
+
+        glPopMatrix();
+    }
+
+
 }
 
 void characterDraw(void)

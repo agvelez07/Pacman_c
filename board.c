@@ -22,6 +22,7 @@ struct board {
     int currentMap;
     int wallMode;
     int gameStatus;
+    int ghostCount;
     Pacman pacman;
 	Ghost* ghosts;
 };
@@ -69,6 +70,11 @@ Pacman getPacman(void)
     return gBoard ? gBoard->pacman : NULL;
 }
 
+Ghost* getGhost(void)
+{
+    return gBoard ? gBoard->ghosts : NULL;
+}
+
 int setBoardPacman(Pacman p)
 {
     if (!gBoard) return 0;
@@ -76,9 +82,16 @@ int setBoardPacman(Pacman p)
     return 1;
 }
 
+int setBoardGhostCount(int ghostsCount)
+{
+    if (!gBoard) return 0;
+    gBoard->ghostCount = ghostsCount;
+    return 1;
+}
+
 void ClearGhosts() {
     if (!gBoard || !gBoard->ghosts) return;
-    int ghostCount = getBoardGhostCount(getCurrentMap());
+    int ghostCount = getBoardGhostCount();
     for (int i = 0; i < ghostCount; i++) {
         if (gBoard->ghosts[i]) {
             free(gBoard->ghosts[i]);
@@ -89,18 +102,24 @@ void ClearGhosts() {
     gBoard->ghosts = NULL;
 }
 
+int getBoardGhostCount(void)
+{
+    return gBoard ? gBoard->ghostCount : 0;
+}
+
 int setBoardGhosts(Ghost* ghosts, int ghostCount)
 {
     if (!gBoard) return 0;
 
     ClearGhosts();
 
+
     if (!ghosts || ghostCount <= 0) {
         return 1; 
     }
 
     gBoard->ghosts = ghosts;
-
+	gBoard->ghostCount = ghostCount;
 
     return 1;
 }
@@ -188,6 +207,7 @@ void boardInit(const char* mapFile)
     gBoard->wallMode = 0;
     gBoard->gameStatus = 0;
     gBoard->pacman = NULL;
+	gBoard->ghostCount = 0;
 
     gBoard->mapsCount = readAllMaps(&gBoard->maps, mapFile);
     if (gBoard->mapsCount <= 0) exit(1);
@@ -227,6 +247,7 @@ void boardDisplay(void)
     }
 
     characterDraw();
+    ghostsDraw(gBoard->ghosts);
 
     glutSwapBuffers();
 }

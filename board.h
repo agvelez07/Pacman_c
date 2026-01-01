@@ -14,12 +14,12 @@ Board getBoard(void);
 Map getCurrentMap(void);
 int getBoardMapCount(void);
 int getCurrentMapIndex(void);
-
+int getBoardGhostCount(void);
 
 Pacman getPacman(void);
 int setBoardPacman(Pacman p);
 int setBoardGhosts(Ghost* ghosts, int ghostCount);
-
+int setBoardGhostCount(int ghostsCount);
 
 void boardDisplay(void);
 void boardReshape(int w, int h);

@@ -14,7 +14,6 @@ struct cell {
 struct map {
     int xSize;
     int ySize;
-    int ghostCount;
     Cell* cells;
 };
 
@@ -46,14 +45,9 @@ Map mapCreate(void)
 
     m->xSize = 0;
     m->ySize = 0;
-    m->ghostCount = 0;
     m->cells = NULL;
 
     return m;
-}
-
-int getBoardGhostCount(Map m) {
-    return m ? m->ghostCount : 0;
 }
 
 void deleteMap(Map m)
@@ -71,7 +65,6 @@ void deleteMap(Map m)
 
     m->xSize = 0;
     m->ySize = 0;
-    m->ghostCount = 0;
 }
 
 int getvisitedCell(Cell c)
@@ -164,7 +157,8 @@ int nextMap(Map m)
 
     if (xSize <= 0 || ySize <= 0) return 0;
 
-    m->ghostCount = ghosts + smartGhosts;
+	int ghostsCount= ghosts + smartGhosts;
+    setBoardGhostCount(ghostsCount);
     m->xSize = xSize;
     m->ySize = ySize;
 
