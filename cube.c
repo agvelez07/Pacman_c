@@ -21,10 +21,15 @@ static GLfloat normals[][3] = {
 };
 
 static GLfloat colors[][3] = {
-    {0.0,0.0,0.0},{1.0,0.0,0.0},
-    {1.0,1.0,0.0},{0.0,1.0,0.0},
-    {0.0,0.0,1.0},{1.0,0.0,1.0},
-    {1.0,1.0,1.0},{0.0,1.0,1.0}
+    {0.0, 0.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {1.0, 1.0, 0.0},
+    {0.0, 1.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {1.0, 0.0, 1.0},
+    {1.0, 1.0, 1.0},
+    {0.0, 1.0, 1.0},
+    {0.5, 1.0, 0.0}
 };
 
 static void polygon(int a, int b, int c, int d)
@@ -37,12 +42,23 @@ static void polygon(int a, int b, int c, int d)
     glEnd();
 }
 
-void colorCube(void)
+void colorCube(Cell c)
 {
-    glColor3fv(colors[1]); polygon(0, 3, 2, 1);
-    glColor3fv(colors[2]); polygon(2, 3, 7, 6);
-    glColor3fv(colors[3]); polygon(0, 4, 7, 3);
-    glColor3fv(colors[4]); polygon(1, 2, 6, 5);
-    glColor3fv(colors[5]); polygon(4, 5, 6, 7);
-    glColor3fv(colors[7]); polygon(0, 1, 5, 4);
+    if (isCellVisited(c) == 1) {
+        glColor3fv(colors[8]);
+        polygon(0, 3, 2, 1);
+        polygon(2, 3, 7, 6);
+        polygon(0, 4, 7, 3);
+        polygon(1, 2, 6, 5);
+        polygon(4, 5, 6, 7);
+        polygon(0, 1, 5, 4);
+    }
+    else {
+        glColor3fv(colors[1]); polygon(0, 3, 2, 1);
+        glColor3fv(colors[2]); polygon(2, 3, 7, 6);
+        glColor3fv(colors[8]); polygon(0, 4, 7, 3);
+        glColor3fv(colors[4]); polygon(1, 2, 6, 5);
+        glColor3fv(colors[5]); polygon(4, 5, 6, 7);
+        glColor3fv(colors[7]); polygon(0, 1, 5, 4);
+    }
 }

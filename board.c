@@ -163,8 +163,7 @@ static void drawMap(Map m)
             glTranslatef((GLfloat)(c * 2), (GLfloat)(rr * 2), 0.0);
             glScalef(0.9, 0.9, 0.2);
 
-            glColor3f(0.2, 0.2, 0.2);
-            colorCube();
+            colorCube(cell);
 
             glPopMatrix();
         }
@@ -317,4 +316,15 @@ void boardReshape(int w, int h)
     gluPerspective(60.0, (GLdouble)w / (GLdouble)h, 0.1, 200.0);
 
     glMatrixMode(GL_MODELVIEW);
+}
+
+void setEndGame(void) {
+    if (!gBoard) return;
+	Pacman p = getPacman();
+    if (p) {
+        
+        if (isPacmanAlive()) {
+            gBoard->gameStatus = 2;
+        }
+    }
 }

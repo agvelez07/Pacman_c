@@ -7,7 +7,7 @@ typedef struct cell* Cell;
 int openMapsFile(const char* filename);
 void closeMapsFile(void);
 
-int getBoardGhostCount(Map m);
+int isCellVisited(Cell c);
 
 Map mapCreate(void);
 void mapDestroy(Map m);
@@ -15,6 +15,7 @@ void deleteMap(Map m);
 
 int setCellNotOcuppied(Map m, int c, int r);
 int setCellOcuppied(Map m, int c, int r);
+int setCellVisited(Cell c);
 
 int nextMap(Map m);
 int readAllMaps(Map** maps, const char* filename);

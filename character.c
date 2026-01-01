@@ -95,7 +95,12 @@ static int isGhostAt(Ghost* ghosts, int count, int r, int c, int skipIndex)
 {
     for (int i = 0; i < count; i++) {
         if (i == skipIndex) continue;
+
         if (ghosts[i]->r == r && ghosts[i]->c == c) return 1;
+
+        if (ghosts[i]->moving) {
+            if (ghosts[i]->nR == r && ghosts[i]->nC == c) return 1;
+        }
     }
     return 0;
 }
@@ -133,9 +138,23 @@ static void moveGhostRandom(Ghost g, Map m, Ghost* allGhosts, int ghostCount, in
 
     for (int d = 0; d < 4; d++) {
         if (tryMoveGhost(g, directions[d][0], directions[d][1], m, allGhosts, ghostCount, myIndex)) {
+
             return;
         }
     }
+}
+
+int reachedPacman(Ghost g) {
+    if (!g) return 0;
+    Pacman p = getPacman();
+    if (!p) return 0;
+
+    if (p->c == g->c && p->r == g->r) {
+        p->alive = 0;
+        setEndGame();
+        return 1;
+    }
+    return 0;
 }
 
 void updateAllGhosts(void)
@@ -155,7 +174,6 @@ void updateAllGhosts(void)
     for (int i = 0; i < ghostCount; i++) {
         Ghost g = ghosts[i];
         if (!g) continue;
-
         if (g->moving) {
             g->t += g->speed;
 
@@ -165,8 +183,13 @@ void updateAllGhosts(void)
                 g->r = g->nR;
                 g->moving = 0;
                 g->t = 0.0;
+
+                if (reachedPacman(g)) {
+                    return;
+                }
             }
         }
+
         else {
             int deltaC = p->c - g->c;
             int deltaR = p->r - g->r;
@@ -406,7 +429,11 @@ void characterInit(void)
         pac->nextKey = 0;
         pac->currentKey = 0;
         setBoardPacman(pac);
+
+        Cell c = cellAt(m, houses[k].r, houses[k].c);
+        if (c) setCellVisited(c);
     }
+   
 
     int ghostCount = getBoardGhostCount();
     if (ghostCount > 0) {
@@ -416,57 +443,80 @@ void characterInit(void)
 
         for (int i = 0; i < ghostCount; i++) ghostArray[i] = NULL;
 
+        HousePos* housesGhost = (HousePos*)malloc((size_t)max * sizeof(HousePos));
+        if (!housesGhost) {
+            free(ghostArray);
+            free(houses);
+            return;
+        }
+
+        int countG = collectHouses(m, housesGhost, max);
+
         for (int i = 0; i < ghostCount; i++) {
 
             ghostArray[i] = (Ghost)malloc(sizeof(struct ghost));
             if (!ghostArray[i]) {
                 for (int j = 0; j < i; j++) free(ghostArray[j]);
+                free(housesGhost);
                 free(ghostArray);
                 free(houses);
                 return;
             }
 
-            HousePos* housesGhost = (HousePos*)malloc((size_t)max * sizeof(HousePos));
-            if (!housesGhost) {
-                for (int j = 0; j <= i; j++) free(ghostArray[j]);
-                free(ghostArray);
-                free(houses);
-                return;
-            }
+            int attempts = 0;
+            int validPosition = 0;
 
-            int countG = collectHouses(m, housesGhost, max);
-            if (countG > 0) {
+            while (!validPosition && attempts < 100) {
+                if (countG <= 0) break;
+
                 int k = rand() % countG;
+                int testC = housesGhost[k].c;
+                int testR = housesGhost[k].r;
 
-                ghostArray[i]->c = housesGhost[k].c;
-                ghostArray[i]->r = housesGhost[k].r;
-                ghostArray[i]->nC = ghostArray[i]->c;
-                ghostArray[i]->nR = ghostArray[i]->r;
+                if (testR == pac->r && testC == pac->c) {
+                    attempts++;
+                    continue;
+                }
 
-                ghostArray[i]->t = 0.0;
-                ghostArray[i]->moving = 0;
-                ghostArray[i]->speed = 0.01 + ((float)(rand() % 4) * 0.01);
+                int occupied = 0;
+                for (int j = 0; j < i; j++) {
+                    if (ghostArray[j]->r == testR && ghostArray[j]->c == testC) {
+                        occupied = 1;
+                        break;
+                    }
+                }
 
-                ghostArray[i]->colorR = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
-                ghostArray[i]->colorG = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
-                ghostArray[i]->colorB = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
-            }
-            else {
-                ghostArray[i]->c = 0;
-                ghostArray[i]->r = 0;
-                ghostArray[i]->nC = ghostArray[i]->c;
-                ghostArray[i]->nR = ghostArray[i]->r;
-                ghostArray[i]->t = 0.0;
-                ghostArray[i]->moving = 0;
-                ghostArray[i]->speed = 0.03;
-                ghostArray[i]->colorR = 1.0;
-                ghostArray[i]->colorG = 0.0;
-                ghostArray[i]->colorB = 1.0;
+                if (!occupied) {
+                    ghostArray[i]->c = testC;
+                    ghostArray[i]->r = testR;
+                    validPosition = 1;
+                }
+
+                attempts++;
             }
 
-            free(housesGhost);
+            if (!validPosition) {
+                if (countG > 0) {
+                    ghostArray[i]->c = housesGhost[0].c;
+                    ghostArray[i]->r = housesGhost[0].r;
+                }
+                else {
+                    ghostArray[i]->c = 0;
+                    ghostArray[i]->r = 0;
+                }
+            }
+
+            ghostArray[i]->nC = ghostArray[i]->c;
+            ghostArray[i]->nR = ghostArray[i]->r;
+            ghostArray[i]->t = 0.0;
+            ghostArray[i]->moving = 0;
+            ghostArray[i]->speed = 0.003 + ((float)(rand() % 4) * 0.006);
+            ghostArray[i]->colorR = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
+            ghostArray[i]->colorG = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
+            ghostArray[i]->colorB = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
         }
 
+        free(housesGhost);
         setBoardGhosts(ghostArray, ghostCount);
     }
 
@@ -680,6 +730,7 @@ int characterMove(unsigned char key)
     if (!next) return 0;
     if (!cellIsWall(next)) return 0;
 
+    setCellVisited(next);
     p->nC = nc;
     p->nR = nr;
     p->t = 0.0;

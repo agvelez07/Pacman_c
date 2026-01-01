@@ -1,6 +1,8 @@
 #ifndef CUBEH
 #define CUBEH
 
-void colorCube(void);
+#include "pm-maps.h"
+
+void colorCube(Cell c);
 
 #endif

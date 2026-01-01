@@ -38,6 +38,15 @@ void closeMapsFile(void)
     }
 }
 
+int isCellVisited(Cell c)
+{
+    if (!c) return 0;
+    if (c->visited) {
+        return 1;
+    }
+    return 0;
+}
+
 Map mapCreate(void)
 {
     Map m = (Map)malloc(sizeof(struct map));
@@ -88,6 +97,13 @@ Cell getCellByCR(Map m, int c, int r)
     }
 
     return NULL;
+}
+
+int setCellVisited(Cell c)
+{
+    if (!c) return 0;
+    c->visited = 1;
+    return 1;
 }
 
 int setCellOcuppied(Map m, int c, int r)
