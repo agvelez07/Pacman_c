@@ -70,7 +70,7 @@ Pacman getPacman(void)
     return gBoard ? gBoard->pacman : NULL;
 }
 
-Ghost* getGhost(void)
+Ghost* getGhosts(void)
 {
     return gBoard ? gBoard->ghosts : NULL;
 }

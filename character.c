@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-#include <string.h>nextKey
+#include <string.h>
 #include <math.h>
 
 #define PI 3.14159
@@ -25,8 +25,8 @@ struct pacman {
     int nC;
     int nR;
     int alive;
-	char currentKey;
-	char nextKey;
+    char currentKey;
+    char nextKey;
     float t;
     int moving;
 };
@@ -37,6 +37,8 @@ struct ghost {
     int nC;
     int nR;
     float t;
+    int moving;
+    float speed;
     float colorR, colorG, colorB;
 };
 
@@ -89,6 +91,126 @@ void updateMouth(void)
     if (mouthAngleDeg < 5.0)  mouthOpening = 1;
 }
 
+static int isGhostAt(Ghost* ghosts, int count, int r, int c, int skipIndex)
+{
+    for (int i = 0; i < count; i++) {
+        if (i == skipIndex) continue;
+        if (ghosts[i]->r == r && ghosts[i]->c == c) return 1;
+    }
+    return 0;
+}
+
+static int tryMoveGhost(Ghost g, int dc, int dr, Map m, Ghost* allGhosts, int ghostCount, int myIndex)
+{
+    int nextC = g->c + dc;
+    int nextR = g->r + dr;
+
+    Cell cell = cellAt(m, nextR, nextC);
+    if (!cell || !cellIsWall(cell)) return 0;
+
+    if (isGhostAt(allGhosts, ghostCount, nextR, nextC, myIndex)) return 0;
+
+    g->nC = nextC;
+    g->nR = nextR;
+    g->t = 0.0;
+    g->moving = 1;
+    return 1;
+}
+
+static void moveGhostRandom(Ghost g, Map m, Ghost* allGhosts, int ghostCount, int myIndex)
+{
+    int directions[4][2] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
+
+    for (int i = 3; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int tempC = directions[i][0];
+        int tempR = directions[i][1];
+        directions[i][0] = directions[j][0];
+        directions[i][1] = directions[j][1];
+        directions[j][0] = tempC;
+        directions[j][1] = tempR;
+    }
+
+    for (int d = 0; d < 4; d++) {
+        if (tryMoveGhost(g, directions[d][0], directions[d][1], m, allGhosts, ghostCount, myIndex)) {
+            return;
+        }
+    }
+}
+
+void updateAllGhosts(void)
+{
+    Ghost* ghosts = getGhosts();
+    if (!ghosts) return;
+
+    int ghostCount = getBoardGhostCount();
+    if (ghostCount <= 0) return;
+
+    Pacman p = getPacman();
+    if (!p) return;
+
+    Map m = getCurrentMap();
+    if (!m) return;
+
+    for (int i = 0; i < ghostCount; i++) {
+        Ghost g = ghosts[i];
+        if (!g) continue;
+
+        if (g->moving) {
+            g->t += g->speed;
+
+            if (g->t >= 1.0) {
+                g->t = 1.0;
+                g->c = g->nC;
+                g->r = g->nR;
+                g->moving = 0;
+                g->t = 0.0;
+            }
+        }
+        else {
+            int deltaC = p->c - g->c;
+            int deltaR = p->r - g->r;
+
+            int moved = 0;
+
+            if (abs(deltaC) >= abs(deltaR)) {
+                if (deltaC != 0) {
+                    int dc = (deltaC > 0) ? 1 : -1;
+                    if (tryMoveGhost(g, dc, 0, m, ghosts, ghostCount, i)) {
+                        moved = 1;
+                    }
+                }
+
+                if (!moved && deltaR != 0) {
+                    int dr = (deltaR > 0) ? 1 : -1;
+                    if (tryMoveGhost(g, 0, dr, m, ghosts, ghostCount, i)) {
+                        moved = 1;
+                    }
+                }
+            }
+            else {
+                if (deltaR != 0) {
+                    int dr = (deltaR > 0) ? 1 : -1;
+                    if (tryMoveGhost(g, 0, dr, m, ghosts, ghostCount, i)) {
+                        moved = 1;
+                    }
+                }
+
+                if (!moved && deltaC != 0) {
+                    int dc = (deltaC > 0) ? 1 : -1;
+                    if (tryMoveGhost(g, dc, 0, m, ghosts, ghostCount, i)) {
+                        moved = 1;
+                    }
+                }
+            }
+
+            if (!moved) {
+                moveGhostRandom(g, m, ghosts, ghostCount, i);
+            }
+        }
+    }
+}
+
 void timer(int v)
 {
     updateMouth();
@@ -104,6 +226,8 @@ void timer(int v)
             p->t = 0.0;
         }
     }
+
+    updateAllGhosts();
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
@@ -123,13 +247,13 @@ int setPacmanNextKey(char key)
     return 1;
 }
 
-int pacmanChangedKey() {
+int pacmanChangedKey(void)
+{
     Pacman p = getPacman();
     if (!p) return -1;
     if (p->currentKey != p->nextKey) return 1;
     return 0;
 }
-
 
 static void drawPacman(void)
 {
@@ -243,7 +367,7 @@ void buildSphere(void)
 
 void characterInit(void)
 {
-    static struct pacman pacData = { 0, 0, 0, 0, 0, 0.0, 0 };
+    static struct pacman pacData = { 0, 0, 0, 0, 0, 0, 0, 0.0, 0 };
     static Pacman pac = &pacData;
 
     static int sphereBuilt = 0;
@@ -279,8 +403,8 @@ void characterInit(void)
         pac->nR = pac->r;
         pac->t = 0.0;
         pac->moving = 0;
-		pac->nextKey = NULL;
-		pac->currentKey = NULL;
+        pac->nextKey = 0;
+        pac->currentKey = 0;
         setBoardPacman(pac);
     }
 
@@ -319,7 +443,9 @@ void characterInit(void)
                 ghostArray[i]->nC = ghostArray[i]->c;
                 ghostArray[i]->nR = ghostArray[i]->r;
 
-                ghostArray[i]->t = 0.7 + ((float)rand() / (float)RAND_MAX) * 0.5;
+                ghostArray[i]->t = 0.0;
+                ghostArray[i]->moving = 0;
+                ghostArray[i]->speed = 0.01 + ((float)(rand() % 4) * 0.01);
 
                 ghostArray[i]->colorR = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
                 ghostArray[i]->colorG = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
@@ -330,7 +456,9 @@ void characterInit(void)
                 ghostArray[i]->r = 0;
                 ghostArray[i]->nC = ghostArray[i]->c;
                 ghostArray[i]->nR = ghostArray[i]->r;
-                ghostArray[i]->t = 0.7;
+                ghostArray[i]->t = 0.0;
+                ghostArray[i]->moving = 0;
+                ghostArray[i]->speed = 0.03;
                 ghostArray[i]->colorR = 1.0;
                 ghostArray[i]->colorG = 0.0;
                 ghostArray[i]->colorB = 1.0;
@@ -391,42 +519,49 @@ void ghostsDraw(Ghost* ghosts)
     GLfloat s = 1.0 / (GLfloat)maxSize;
 
     for (int i = 0; i < ghostsCount; i++) {
+        Ghost g = ghosts[i];
+        if (!g) continue;
 
-        int rr = (rows - 1) - ghosts[i]->r;
+        float drawC = (float)g->c;
+        float drawR = (float)g->r;
+
+        if (g->moving) {
+            drawC = (float)g->c + g->t * ((float)g->nC - (float)g->c);
+            drawR = (float)g->r + g->t * ((float)g->nR - (float)g->r);
+        }
+
+        float rr = (float)(rows - 1) - drawR;
 
         glPushMatrix();
 
         glScalef(s, s, s);
         glTranslatef(-(GLfloat)(cols - 1), -(GLfloat)(rows - 1), 0.0);
 
-        glTranslatef((GLfloat)(ghosts[i]->c * 2), (GLfloat)(rr * 2), 1.0);
+        glTranslatef((GLfloat)(drawC * 2), (GLfloat)(rr * 2), 1.0);
         glScalef(1.6, 1.6, 1.6);
 
         glRotatef(90.0, 1.0, 0.0, 0.0);
 
-        glColor3f(ghosts[i]->colorR, ghosts[i]->colorG, ghosts[i]->colorB);
-
-        drawSingleGhost(ghosts[i]);
+        drawSingleGhost(g);
 
         glPopMatrix();
     }
 }
 
-int isPacmanAlive()
+int isPacmanAlive(void)
 {
     Pacman p = getPacman();
     if (!p) return 0;
     return p->alive;
 }
 
-int pacmanDie()
+int pacmanDie(void)
 {
     Pacman p = getPacman();
     if (!p) return 0;
     p->alive = 0;
     return 1;
 }
-
 
 void characterDraw(void)
 {
@@ -464,18 +599,18 @@ void characterDraw(void)
     glRotatef(90.0, 1.0, 0.0, 0.0);
 
     switch (p->currentKey) {
-    case 'd': 
+    case 'd':
         break;
 
-    case 'w': 
+    case 'w':
         glRotatef(90.0, 0.0, 1.0, 0.0);
         break;
 
-    case 'a':  
+    case 'a':
         glRotatef(180.0, 0.0, 1.0, 0.0);
         break;
 
-    case 's':  
+    case 's':
         glRotatef(270.0, 0.0, 1.0, 0.0);
         break;
     }
@@ -485,14 +620,14 @@ void characterDraw(void)
     glPopMatrix();
 }
 
-int setPacmanCurrentKey()
+int setPacmanCurrentKey(void)
 {
     Pacman p = getPacman();
+    if (!p) return 0;
     if (!p->nextKey) return 0;
     p->currentKey = p->nextKey;
     return 1;
 }
-
 
 int characterMove(unsigned char key)
 {
@@ -508,28 +643,28 @@ int characterMove(unsigned char key)
     int dr = 0;
 
     if (key == 'w' || key == 'W') {
-        dr = -1; 
-        if (key != p->currentKey) {  
+        dr = -1;
+        if (key != p->currentKey) {
             setPacmanNextKey('w');
-            setPacmanCurrentKey();   
+            setPacmanCurrentKey();
         }
     }
-    if (key == 's' || key == 'S'){ 
-        dr = 1; 
+    if (key == 's' || key == 'S') {
+        dr = 1;
         if (key != p->currentKey) {
             setPacmanNextKey('s');
             setPacmanCurrentKey();
         }
     }
     if (key == 'd' || key == 'D') {
-        dc = 1; 
+        dc = 1;
         if (key != p->currentKey) {
             setPacmanNextKey('d');
             setPacmanCurrentKey();
         }
     }
     if (key == 'a' || key == 'A') {
-        dc = -1; 
+        dc = -1;
         if (key != p->currentKey) {
             setPacmanNextKey('a');
             setPacmanCurrentKey();

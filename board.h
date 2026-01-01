@@ -12,11 +12,12 @@ void boardDestroy(void);
 Board getBoard(void);
 
 Map getCurrentMap(void);
+Pacman getPacman(void);
+Ghost* getGhosts(void);
 int getBoardMapCount(void);
 int getCurrentMapIndex(void);
 int getBoardGhostCount(void);
 
-Pacman getPacman(void);
 int setBoardPacman(Pacman p);
 int setBoardGhosts(Ghost* ghosts, int ghostCount);
 int setBoardGhostCount(int ghostsCount);
