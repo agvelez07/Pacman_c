@@ -28,4 +28,6 @@ int mapYSize(Map m);
 int cellIsWall(Cell c);
 int getCellOccupied(Cell c);
 
+void resetMapVisited(Map m);
+
 #endif

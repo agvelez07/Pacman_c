@@ -16,6 +16,10 @@ void timer(int v);
 int getPacmanRow(Pacman p);
 int getPacmanCol(Pacman p);
 
+
 int isPacmanAlive(void);
+
+int checkWinCondition(void);
+void updateAllGhosts(void);
 
 #endif

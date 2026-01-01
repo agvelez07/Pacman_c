@@ -266,3 +266,16 @@ int readAllMaps(Map** maps, const char* filename)
     closeMapsFile();
     return count;
 }
+
+void resetMapVisited(Map m)
+{
+    if (!m || !m->cells) return;
+
+    int total = m->xSize * m->ySize;
+
+    for (int i = 0; i < total; i++) {
+        if (m->cells[i]) {
+            m->cells[i]->visited = 0;
+        }
+    }
+}

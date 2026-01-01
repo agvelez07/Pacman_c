@@ -7,6 +7,7 @@
 typedef struct board* Board;
 
 void boardInit(const char* mapFile);
+void restartGame(void);
 void setEndGame(void);
 
 Board getBoard(void);

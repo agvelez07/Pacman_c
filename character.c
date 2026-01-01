@@ -247,6 +247,11 @@ void timer(int v)
             p->r = p->nR;
             p->moving = 0;
             p->t = 0.0;
+
+ 
+            if (checkWinCondition()) {
+                restartGame();  
+            }
         }
     }
 
@@ -737,4 +742,27 @@ int characterMove(unsigned char key)
     p->moving = 1;
 
     return 1;
+}
+
+int checkWinCondition(void)
+{
+    Map m = getCurrentMap();
+    if (!m) return 0;
+
+    int cols = mapXSize(m);
+    int rows = mapYSize(m);
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            Cell cell = cellAt(m, r, c);
+            if (!cell) continue;
+            if (!cellIsWall(cell)) continue;
+
+            if (!isCellVisited(cell)) {
+                return 0; 
+            }
+        }
+    }
+
+    return 1; 
 }

@@ -1,5 +1,9 @@
 #ifdef __APPLE__
-#include <GLUT/glut.h>
+#include <GLUT
+
+
+
+glut.h>
 #else
 #include <GL/glut.h>
 #endif
@@ -278,11 +282,7 @@ void boardKey(unsigned char key, int x, int y)
     if (key == 'J') camYaw -= rotStep;
 
     if (key == 'r' || key == 'R') {
-        camX = 0.0;
-        camY = 0.0;
-        camZ = 12.0;
-        camPitch = 0.0;
-        camYaw = 0.0;
+        restartGame();
     }
 
     if (key == 'n' || key == 'N') {
@@ -318,13 +318,33 @@ void boardReshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
-void setEndGame(void) {
+ 
+void restartGame(void)
+{
     if (!gBoard) return;
-	Pacman p = getPacman();
-    if (p) {
-        
-        if (isPacmanAlive()) {
-            gBoard->gameStatus = 2;
-        }
+     
+    ClearGhosts();
+     
+    Map m = getCurrentMap();
+    if (m) {
+        resetMapVisited(m);
+    }
+     
+    if (gBoard) {
+        gBoard->gameStatus = 0;
+    }
+     
+    characterInit();
+
+    glutPostRedisplay();
+}
+
+void setEndGame(void)
+{
+    if (!gBoard) return;
+
+    if (isPacmanAlive() == 0) {
+        gBoard->gameStatus = 1;   
+        restartGame();  
     }
 }
