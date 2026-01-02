@@ -3,12 +3,14 @@
 #include <string.h>
 
 #include "pm-maps.h"
+#include "board.h"
 
 struct cell {
     int r, c;
-    int wall;
+    int house;
     int visited;
     int occupied;
+    int wall;
 };
 
 struct map {
@@ -41,10 +43,13 @@ void closeMapsFile(void)
 int isCellVisited(Cell c)
 {
     if (!c) return 0;
-    if (c->visited) {
-        return 1;
-    }
-    return 0;
+    return c->visited;
+}
+
+int hasWall(Cell c)
+{
+    if (!c) return 0;
+    return c->wall;
 }
 
 Map mapCreate(void)
@@ -76,20 +81,14 @@ void deleteMap(Map m)
     m->ySize = 0;
 }
 
-int getvisitedCell(Cell c)
-{
-    return c ? c->visited : 0;
-}
-
-
 Cell getCellByCR(Map m, int c, int r)
 {
     if (!m || !m->cells) return NULL;
 
-    int maxCells = m->xSize * m->ySize;   
+    int maxCells = m->xSize * m->ySize;
 
     for (int i = 0; i < maxCells; i++) {
-        if (!m->cells[i]) break;   
+        if (!m->cells[i]) break;
 
         if (m->cells[i]->c == c && m->cells[i]->r == r) {
             return m->cells[i];
@@ -97,6 +96,13 @@ Cell getCellByCR(Map m, int c, int r)
     }
 
     return NULL;
+}
+
+int toggleWall(Cell c)
+{
+    if (!c) return 0;
+    c->wall = !c->wall;
+    return c->wall;
 }
 
 int setCellVisited(Cell c)
@@ -108,10 +114,10 @@ int setCellVisited(Cell c)
 
 int setCellOcuppied(Map m, int c, int r)
 {
-	if (!m) return 0;
-	Cell cell = getCellByCR(m, c, r);
-	if (!cell) return 0;
-	cell->occupied = 1;
+    if (!m) return 0;
+    Cell cell = getCellByCR(m, c, r);
+    if (!cell) return 0;
+    cell->occupied = 1;
     return 1;
 }
 
@@ -148,9 +154,9 @@ Cell cellAt(Map m, int r, int c)
     return m->cells[r * m->xSize + c];
 }
 
-int cellIsWall(Cell c)
+int cellIsHouse(Cell c)
 {
-    return c ? c->wall : 0;
+    return c ? c->house : 0;
 }
 
 int getCellOccupied(Cell c)
@@ -173,7 +179,7 @@ int nextMap(Map m)
 
     if (xSize <= 0 || ySize <= 0) return 0;
 
-	int ghostsCount= ghosts + smartGhosts;
+    int ghostsCount = ghosts + smartGhosts;
     setBoardGhostCount(ghostsCount);
     m->xSize = xSize;
     m->ySize = ySize;
@@ -194,9 +200,10 @@ int nextMap(Map m)
         }
         m->cells[i]->r = 0;
         m->cells[i]->c = 0;
-        m->cells[i]->wall = 0;
+        m->cells[i]->house = 0;
         m->cells[i]->visited = 0;
         m->cells[i]->occupied = 0;
+        m->cells[i]->wall = 0;
     }
 
     for (int r = 0; r < ySize; r++) {
@@ -215,9 +222,10 @@ int nextMap(Map m)
 
             m->cells[idx]->r = r;
             m->cells[idx]->c = c;
-            m->cells[idx]->wall = (line[c] == '1');
+            m->cells[idx]->house = (line[c] == '1');
             m->cells[idx]->visited = 0;
             m->cells[idx]->occupied = 0;
+            m->cells[idx]->wall = 0;
         }
     }
 
@@ -267,6 +275,19 @@ int readAllMaps(Map** maps, const char* filename)
     return count;
 }
 
+void resetWalls(Map m)
+{
+    if (!m || !m->cells) return;
+
+    int total = m->xSize * m->ySize;
+
+    for (int i = 0; i < total; i++) {
+        if (m->cells[i]) {
+            m->cells[i]->wall = 0;
+        }
+    }
+}
+
 void resetMapVisited(Map m)
 {
     if (!m || !m->cells) return;
@@ -279,3 +300,4 @@ void resetMapVisited(Map m)
         }
     }
 }
+

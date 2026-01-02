@@ -1,9 +1,5 @@
 #ifdef __APPLE__
-#include <GLUT
-
-
-
-glut.h>
+#include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
@@ -28,15 +24,15 @@ struct board {
     int gameStatus;
     int ghostCount;
     Pacman pacman;
-	Ghost* ghosts;
+    Ghost* ghosts;
 };
 
 static GLfloat camX = 0.0;
 static GLfloat camY = 0.0;
-static GLfloat camZ = 3.0;
+static GLfloat camZ = 2.0;
 
-static GLfloat camPitch = 0.0;  
-static GLfloat camYaw = 0.0;   
+static GLfloat camPitch = 0.0;
+static GLfloat camYaw = 0.0;
 
 static GLfloat centerX = 0.0;
 static GLfloat centerY = 0.0;
@@ -79,6 +75,25 @@ Ghost* getGhosts(void)
     return gBoard ? gBoard->ghosts : NULL;
 }
 
+int getBoardWallMode(void)
+{
+    return gBoard ? gBoard->wallMode : 0;
+}
+
+int setBoardWallMode(void)
+{
+    if (!gBoard) return 0;
+    gBoard->wallMode = !gBoard->wallMode;
+
+    if (gBoard->wallMode == 0) {
+        Map m = getCurrentMap();
+        if (m) {
+            resetWalls(m);
+        }
+    }
+
+    return gBoard->wallMode;
+}
 int setBoardPacman(Pacman p)
 {
     if (!gBoard) return 0;
@@ -93,7 +108,8 @@ int setBoardGhostCount(int ghostsCount)
     return 1;
 }
 
-void ClearGhosts() {
+void ClearGhosts(void)
+{
     if (!gBoard || !gBoard->ghosts) return;
     int ghostCount = getBoardGhostCount();
     if (ghostCount <= 0) return;
@@ -118,17 +134,15 @@ int setBoardGhosts(Ghost* ghosts, int ghostCount)
 
     ClearGhosts();
 
-
     if (!ghosts || ghostCount <= 0) {
-        return 1; 
+        return 1;
     }
 
     gBoard->ghosts = ghosts;
-	gBoard->ghostCount = ghostCount;
+    gBoard->ghostCount = ghostCount;
 
     return 1;
 }
-
 
 static void drawMap(Map m)
 {
@@ -160,16 +174,42 @@ static void drawMap(Map m)
             Cell cell = cellAt(m, r, c);
             if (!cell) continue;
 
-            if (!cellIsWall(cell)) continue;
+            if (!cellIsHouse(cell)) continue;
+
+            int rr = (rows - 1) - r;
 
             glPushMatrix();
-            int rr = (rows - 1) - r;
             glTranslatef((GLfloat)(c * 2), (GLfloat)(rr * 2), 0.0);
             glScalef(0.9, 0.9, 0.2);
-
             colorCube(cell);
-
             glPopMatrix();
+
+            if (hasWall(cell)) {
+                glPushMatrix();
+                glTranslatef((GLfloat)(c * 2), (GLfloat)(rr * 2), 0.4);
+                glScalef(0.9, 0.9, 0.2);
+                drawWall();
+                glPopMatrix();
+
+                Cell right = cellAt(m, r, c + 1);
+                if (right && cellIsHouse(right) && hasWall(right)) {
+                    glPushMatrix();
+                    glTranslatef((GLfloat)(c * 2 + 0.9), (GLfloat)(rr * 2), 0.4);
+                    glScalef(0.2, 0.36, 0.4);
+                    drawWallConnection();
+                    glPopMatrix();
+                }
+
+                Cell down = cellAt(m, r + 1, c);
+                int rrDown = (rows - 1) - (r + 1);
+                if (down && cellIsHouse(down) && hasWall(down)) {
+                    glPushMatrix();
+                    glTranslatef((GLfloat)(c * 2), (GLfloat)(rrDown * 2 + 0.9), 0.4);
+                    glScalef(0.36, 0.2, 0.4);
+                    drawWallConnection();
+                    glPopMatrix();
+                }
+            }
         }
     }
 
@@ -211,7 +251,7 @@ void boardInit(const char* mapFile)
     gBoard->wallMode = 0;
     gBoard->gameStatus = 0;
     gBoard->pacman = NULL;
-	gBoard->ghostCount = 0;
+    gBoard->ghostCount = 0;
     gBoard->ghosts = NULL;
 
     gBoard->mapsCount = readAllMaps(&gBoard->maps, mapFile);
@@ -241,9 +281,9 @@ void boardDisplay(void)
         }
 
         glTranslatef(0.0, 0.0, -camZ);
-         
+
         glRotatef(camPitch, 1.0, 0.0, 0.0);
-         
+
         glRotatef(camYaw, 0.0, 0.0, 1.0);
 
         glTranslatef(-camX, -camY, 0.0);
@@ -257,7 +297,7 @@ void boardDisplay(void)
     glutSwapBuffers();
 }
 
-void boardKey(unsigned char key, int x, int y) 
+void boardKey(unsigned char key, int x, int y)
 {
     (void)x;
     (void)y;
@@ -285,32 +325,28 @@ void boardKey(unsigned char key, int x, int y)
         restartGame();
     }
 
+    if (key == 'w' || key == 'W') {
+        setBoardWallMode();
+    }
+
     if (key == 'n' || key == 'N') {
         if (gBoard && gBoard->mapsCount > 0) {
             gBoard->currentMap = (gBoard->currentMap + 1) % gBoard->mapsCount;
-            restartGame();  
+            restartGame();
         }
-    }
-     
-    if (key == 'w' || key == 'W' ||
-        key == 'a' || key == 'A' ||
-        key == 's' || key == 'S' ||
-        key == 'd' || key == 'D')
-    {
-        characterMove((int)key);
     }
 
     if (key == 27) exit(0);
 
     glutPostRedisplay();
 }
- 
+
 void boardSpecialKey(int key, int x, int y)
 {
     (void)x;
     (void)y;
 
-    characterMove(key);   
+    characterMove(key);
 
     glutPostRedisplay();
 }
@@ -328,22 +364,23 @@ void boardReshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
- 
 void restartGame(void)
 {
     if (!gBoard) return;
-     
+
     ClearGhosts();
-     
+
     Map m = getCurrentMap();
     if (m) {
         resetMapVisited(m);
+        resetWalls(m);
     }
-     
+
     if (gBoard) {
         gBoard->gameStatus = 0;
+        gBoard->wallMode = 0;
     }
-     
+
     characterInit();
 
     glutPostRedisplay();
@@ -354,7 +391,7 @@ void setEndGame(void)
     if (!gBoard) return;
 
     if (isPacmanAlive() == 0) {
-        gBoard->gameStatus = 1;   
-        restartGame();  
+        gBoard->gameStatus = 1;
+        restartGame();
     }
 }

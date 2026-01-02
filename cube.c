@@ -1,12 +1,5 @@
 #ifdef __APPLE__
-#include <GLUT
-
-
-
-
-
-
-glut.h>
+#include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
@@ -49,16 +42,21 @@ static void polygon(int a, int b, int c, int d)
     glEnd();
 }
 
+static void drawCube(void)
+{
+    polygon(0, 3, 2, 1);
+    polygon(2, 3, 7, 6);
+    polygon(0, 4, 7, 3);
+    polygon(1, 2, 6, 5);
+    polygon(4, 5, 6, 7);
+    polygon(0, 1, 5, 4);
+}
+
 void colorCube(Cell c)
 {
     if (isCellVisited(c) == 1) {
         glColor3fv(colors[8]);
-        polygon(0, 3, 2, 1);
-        polygon(2, 3, 7, 6);
-        polygon(0, 4, 7, 3);
-        polygon(1, 2, 6, 5);
-        polygon(4, 5, 6, 7);
-        polygon(0, 1, 5, 4);
+        drawCube();
     }
     else {
         glColor3fv(colors[1]); polygon(0, 3, 2, 1);
@@ -68,4 +66,20 @@ void colorCube(Cell c)
         glColor3fv(colors[5]); polygon(4, 5, 6, 7);
         glColor3fv(colors[7]); polygon(0, 1, 5, 4);
     }
+}
+
+void drawWall(void)
+{
+    glColor3f(1.0, 0.843, 0.0);
+
+    glPushMatrix();
+    glScalef(0.4, 0.4, 2.0);
+    drawCube();
+    glPopMatrix();
+}
+
+void drawWallConnection(void)
+{
+    glColor3f(1.0, 0.843, 0.0);
+    drawCube();
 }

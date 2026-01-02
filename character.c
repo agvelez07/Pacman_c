@@ -111,7 +111,9 @@ static int tryMoveGhost(Ghost g, int dc, int dr, Map m, Ghost* allGhosts, int gh
     int nextR = g->r + dr;
 
     Cell cell = cellAt(m, nextR, nextC);
-    if (!cell || !cellIsWall(cell)) return 0;
+    if (!cell || !cellIsHouse(cell)) return 0;
+
+    if (hasWall(cell)) return 0;
 
     if (isGhostAt(allGhosts, ghostCount, nextR, nextC, myIndex)) return 0;
 
@@ -138,13 +140,13 @@ static void moveGhostRandom(Ghost g, Map m, Ghost* allGhosts, int ghostCount, in
 
     for (int d = 0; d < 4; d++) {
         if (tryMoveGhost(g, directions[d][0], directions[d][1], m, allGhosts, ghostCount, myIndex)) {
-
             return;
         }
     }
 }
 
-int reachedPacman(Ghost g) {
+int reachedPacman(Ghost g)
+{
     if (!g) return 0;
     Pacman p = getPacman();
     if (!p) return 0;
@@ -189,7 +191,6 @@ void updateAllGhosts(void)
                 }
             }
         }
-
         else {
             int deltaC = p->c - g->c;
             int deltaR = p->r - g->r;
@@ -248,9 +249,8 @@ void timer(int v)
             p->moving = 0;
             p->t = 0.0;
 
- 
             if (checkWinCondition()) {
-                restartGame();  
+                restartGame();
             }
         }
     }
@@ -333,7 +333,7 @@ static int collectHouses(Map m, HousePos* houses, int max)
         for (int c = 0; c < cols; c++) {
             Cell cell = cellAt(m, r, c);
             if (!cell) continue;
-            if (!cellIsWall(cell)) continue;
+            if (!cellIsHouse(cell)) continue;
             if (count < max) {
                 houses[count].c = c;
                 houses[count].r = r;
@@ -438,7 +438,6 @@ void characterInit(void)
         Cell c = cellAt(m, houses[k].r, houses[k].c);
         if (c) setCellVisited(c);
     }
-   
 
     int ghostCount = getBoardGhostCount();
     if (ghostCount > 0) {
@@ -654,18 +653,18 @@ void characterDraw(void)
     glRotatef(90.0, 1.0, 0.0, 0.0);
 
     switch (p->currentKey) {
-    case 'd':
+    case GLUT_KEY_RIGHT:
         break;
 
-    case 'w':
+    case GLUT_KEY_UP:
         glRotatef(90.0, 0.0, 1.0, 0.0);
         break;
 
-    case 'a':
+    case GLUT_KEY_LEFT:
         glRotatef(180.0, 0.0, 1.0, 0.0);
         break;
 
-    case 's':
+    case GLUT_KEY_DOWN:
         glRotatef(270.0, 0.0, 1.0, 0.0);
         break;
     }
@@ -696,61 +695,32 @@ int characterMove(int key)
 
     int dc = 0;
     int dr = 0;
- 
+
     if (key == GLUT_KEY_UP) {
         dr = -1;
-        if ('w' != p->currentKey) {
-            setPacmanNextKey('w');
+        if (GLUT_KEY_UP != p->currentKey) {
+            setPacmanNextKey(GLUT_KEY_UP);
             setPacmanCurrentKey();
         }
     }
     else if (key == GLUT_KEY_DOWN) {
         dr = 1;
-        if ('s' != p->currentKey) {
-            setPacmanNextKey('s');
+        if (GLUT_KEY_DOWN != p->currentKey) {
+            setPacmanNextKey(GLUT_KEY_DOWN);
             setPacmanCurrentKey();
         }
     }
     else if (key == GLUT_KEY_RIGHT) {
         dc = 1;
-        if ('d' != p->currentKey) {
-            setPacmanNextKey('d');
+        if (GLUT_KEY_RIGHT != p->currentKey) {
+            setPacmanNextKey(GLUT_KEY_RIGHT);
             setPacmanCurrentKey();
         }
     }
     else if (key == GLUT_KEY_LEFT) {
         dc = -1;
-        if ('a' != p->currentKey) {
-            setPacmanNextKey('a');
-            setPacmanCurrentKey();
-        }
-    }
- 
-    else if (key == 'w' || key == 'W') {
-        dr = -1;
-        if ('w' != p->currentKey) {
-            setPacmanNextKey('w');
-            setPacmanCurrentKey();
-        }
-    }
-    else if (key == 's' || key == 'S') {
-        dr = 1;
-        if ('s' != p->currentKey) {
-            setPacmanNextKey('s');
-            setPacmanCurrentKey();
-        }
-    }
-    else if (key == 'd' || key == 'D') {
-        dc = 1;
-        if ('d' != p->currentKey) {
-            setPacmanNextKey('d');
-            setPacmanCurrentKey();
-        }
-    }
-    else if (key == 'a' || key == 'A') {
-        dc = -1;
-        if ('a' != p->currentKey) {
-            setPacmanNextKey('a');
+        if (GLUT_KEY_LEFT != p->currentKey) {
+            setPacmanNextKey(GLUT_KEY_LEFT);
             setPacmanCurrentKey();
         }
     }
@@ -762,9 +732,21 @@ int characterMove(int key)
 
     Cell next = cellAt(m, nr, nc);
     if (!next) return 0;
-    if (!cellIsWall(next)) return 0;
+    if (!cellIsHouse(next)) return 0;
+
+    if (hasWall(next)) {
+        toggleWall(next);
+    }
 
     setCellVisited(next);
+
+    if (getBoardWallMode() == 1) {
+        Cell current = cellAt(m, p->r, p->c);
+        if (current) {
+            toggleWall(current);
+        }
+    }
+
     p->nC = nc;
     p->nR = nr;
     p->t = 0.0;
@@ -785,13 +767,13 @@ int checkWinCondition(void)
         for (int c = 0; c < cols; c++) {
             Cell cell = cellAt(m, r, c);
             if (!cell) continue;
-            if (!cellIsWall(cell)) continue;
+            if (!cellIsHouse(cell)) continue;
 
             if (!isCellVisited(cell)) {
-                return 0; 
+                return 0;
             }
         }
     }
 
-    return 1; 
+    return 1;
 }
