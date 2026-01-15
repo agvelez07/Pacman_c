@@ -29,6 +29,7 @@ struct pacman {
     int nextKey;
     float t;
     int moving;
+    int steps;  // NOVO: Contador de passos
 };
 
 struct ghost {
@@ -237,25 +238,31 @@ void updateAllGhosts(void)
 
 void timer(int v)
 {
-    updateMouth();
+ 
+    int paused = getBoardPaused();
+    int gameStatus = getBoardGameStatus();
 
-    Pacman p = getPacman();
-    if (p && p->alive == 1 && p->moving) {
-        p->t += 0.05;
-        if (p->t >= 1.0) {
-            p->t = 1.0;
-            p->c = p->nC;
-            p->r = p->nR;
-            p->moving = 0;
-            p->t = 0.0;
+    if (!paused && gameStatus == 0) {
+        updateMouth();
 
-            if (checkWinCondition()) {
-                restartGame();
+        Pacman p = getPacman();
+        if (p && p->alive == 1 && p->moving) {
+            p->t += 0.05;
+            if (p->t >= 1.0) {
+                p->t = 1.0;
+                p->c = p->nC;
+                p->r = p->nR;
+                p->moving = 0;
+                p->t = 0.0;
+
+                if (checkWinCondition()) {
+                    setBoardGameStatus(2);  
+                }
             }
         }
-    }
 
-    updateAllGhosts();
+        updateAllGhosts();
+    }
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
@@ -354,6 +361,11 @@ int getPacmanCol(Pacman p)
 {
     return p ? p->c : -1;
 }
+ 
+int getPacmanSteps(Pacman p)
+{
+    return p ? p->steps : 0;
+}
 
 void buildSphere(void)
 {
@@ -395,7 +407,7 @@ void buildSphere(void)
 
 void characterInit(void)
 {
-    static struct pacman pacData = { 0, 0, 0, 0, 0, 0, 0, 0.0, 0 };
+    static struct pacman pacData = { 0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0 };  
     static Pacman pac = &pacData;
 
     static int sphereBuilt = 0;
@@ -433,6 +445,7 @@ void characterInit(void)
         pac->moving = 0;
         pac->nextKey = 0;
         pac->currentKey = 0;
+        pac->steps = 0;  
         setBoardPacman(pac);
 
         Cell c = cellAt(m, houses[k].r, houses[k].c);
@@ -751,6 +764,7 @@ int characterMove(int key)
     p->nR = nr;
     p->t = 0.0;
     p->moving = 1;
+    p->steps++;   
 
     return 1;
 }

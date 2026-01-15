@@ -24,6 +24,11 @@ int setBoardPacman(Pacman p);
 int setBoardGhosts(Ghost* ghosts, int ghostCount);
 int setBoardGhostCount(int ghostsCount);
 int setBoardWallMode(void);
+ 
+int getBoardPaused(void);
+void toggleBoardPaused(void);
+int getBoardGameStatus(void);
+void setBoardGameStatus(int status);
 
 void boardDisplay(void);
 void boardReshape(int w, int h);

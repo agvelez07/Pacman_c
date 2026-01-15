@@ -5,6 +5,8 @@
 #endif
 
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "board.h"
 #include "cube.h"
@@ -21,8 +23,9 @@ struct board {
     int mapsCount;
     int currentMap;
     int wallMode;
-    int gameStatus;
+    int gameStatus;    
     int ghostCount;
+    int paused;       
     Pacman pacman;
     Ghost* ghosts;
 };
@@ -94,6 +97,30 @@ int setBoardWallMode(void)
 
     return gBoard->wallMode;
 }
+
+ 
+int getBoardPaused(void)
+{
+    return gBoard ? gBoard->paused : 0;
+}
+
+void toggleBoardPaused(void)
+{
+    if (!gBoard) return;
+    gBoard->paused = !gBoard->paused;
+}
+ 
+int getBoardGameStatus(void)
+{
+    return gBoard ? gBoard->gameStatus : 0;
+}
+
+void setBoardGameStatus(int status)
+{
+    if (!gBoard) return;
+    gBoard->gameStatus = status;
+}
+
 int setBoardPacman(Pacman p)
 {
     if (!gBoard) return 0;
@@ -166,6 +193,7 @@ static void drawMap(Map m)
     glPushMatrix();
 
     glScalef(1.0 / (GLfloat)maxSize, 1.0 / (GLfloat)maxSize, 1.0 / (GLfloat)maxSize);
+
     glTranslatef(-centerX, -centerY, 0.0);
 
     for (int r = 0; r < rows; r++) {
@@ -250,6 +278,7 @@ void boardInit(const char* mapFile)
     gBoard->currentMap = 0;
     gBoard->wallMode = 0;
     gBoard->gameStatus = 0;
+    gBoard->paused = 0;   
     gBoard->pacman = NULL;
     gBoard->ghostCount = 0;
     gBoard->ghosts = NULL;
@@ -260,6 +289,38 @@ void boardInit(const char* mapFile)
     gBoard->currentMap = 0;
 
     characterInit();
+}
+ 
+static void drawTextBackground(void)
+{
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor4f(0.0, 0.0, 0.0, 0.8);
+
+    glBegin(GL_QUADS);
+    glVertex2f(W / 2 - 200, H / 2 - 40);
+    glVertex2f(W / 2 + 200, H / 2 - 40);
+    glVertex2f(W / 2 + 200, H / 2 + 40);
+    glVertex2f(W / 2 - 200, H / 2 + 40);
+    glEnd();
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+}
+
+static void drawText(const char* text)
+{
+    glDisable(GL_DEPTH_TEST);
+    glColor3f(1.0, 1.0, 1.0);
+
+    glRasterPos2f(W / 2 - 100, H / 2);
+    for (const char* c = text; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void boardDisplay(void)
@@ -281,11 +342,8 @@ void boardDisplay(void)
         }
 
         glTranslatef(0.0, 0.0, -camZ);
-
         glRotatef(camPitch, 1.0, 0.0, 0.0);
-
         glRotatef(camYaw, 0.0, 0.0, 1.0);
-
         glTranslatef(-camX, -camY, 0.0);
 
         drawMap(m);
@@ -293,6 +351,47 @@ void boardDisplay(void)
 
     characterDraw();
     ghostsDraw(gBoard->ghosts);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, W, 0.0, H);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    Pacman p = getPacman();
+
+    if (p) {
+        char stepText[50];
+        sprintf(stepText, "Steps: %d", getPacmanSteps(p));
+        glColor3f(1.0, 1.0, 1.0);
+        glRasterPos2f(10, H - 25);
+        for (const char* c = stepText; *c != '\0'; c++) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+        }
+    }
+
+    if (gBoard && gBoard->paused) {
+        drawTextBackground();
+        drawText("Game Paused - Press P to continue");
+    }
+
+    if (gBoard && gBoard->gameStatus == 1) {
+        drawTextBackground();
+        drawText("GAME OVER!  - Press R to Reset");
+    }
+
+    else if (gBoard && gBoard->gameStatus == 2) {
+        drawTextBackground();
+        drawText("Winner!  - Press R to reset");
+    }
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 
     glutSwapBuffers();
 }
@@ -320,9 +419,13 @@ void boardKey(unsigned char key, int x, int y)
 
     if (key == 'j') camYaw += rotStep;
     if (key == 'J') camYaw -= rotStep;
-
+ 
     if (key == 'r' || key == 'R') {
         restartGame();
+    }
+     
+    if (key == 'p' || key == 'P') {
+        toggleBoardPaused();
     }
 
     if (key == 'w' || key == 'W') {
@@ -345,6 +448,10 @@ void boardSpecialKey(int key, int x, int y)
 {
     (void)x;
     (void)y;
+ 
+    if (gBoard && (gBoard->paused || gBoard->gameStatus != 0)) {
+        return;
+    }
 
     characterMove(key);
 
@@ -379,6 +486,7 @@ void restartGame(void)
     if (gBoard) {
         gBoard->gameStatus = 0;
         gBoard->wallMode = 0;
+        gBoard->paused = 0;  
     }
 
     characterInit();
@@ -391,7 +499,6 @@ void setEndGame(void)
     if (!gBoard) return;
 
     if (isPacmanAlive() == 0) {
-        gBoard->gameStatus = 1;
-        restartGame();
+        gBoard->gameStatus = 1;   
     }
 }
