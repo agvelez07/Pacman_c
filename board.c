@@ -23,9 +23,9 @@ struct board {
     int mapsCount;
     int currentMap;
     int wallMode;
-    int gameStatus;    
+    int gameStatus;
     int ghostCount;
-    int paused;       
+    int paused;
     Pacman pacman;
     Ghost* ghosts;
 };
@@ -98,7 +98,6 @@ int setBoardWallMode(void)
     return gBoard->wallMode;
 }
 
- 
 int getBoardPaused(void)
 {
     return gBoard ? gBoard->paused : 0;
@@ -109,7 +108,7 @@ void toggleBoardPaused(void)
     if (!gBoard) return;
     gBoard->paused = !gBoard->paused;
 }
- 
+
 int getBoardGameStatus(void)
 {
     return gBoard ? gBoard->gameStatus : 0;
@@ -278,7 +277,7 @@ void boardInit(const char* mapFile)
     gBoard->currentMap = 0;
     gBoard->wallMode = 0;
     gBoard->gameStatus = 0;
-    gBoard->paused = 0;   
+    gBoard->paused = 0;
     gBoard->pacman = NULL;
     gBoard->ghostCount = 0;
     gBoard->ghosts = NULL;
@@ -290,7 +289,7 @@ void boardInit(const char* mapFile)
 
     characterInit();
 }
- 
+
 static void drawTextBackground(void)
 {
     glDisable(GL_DEPTH_TEST);
@@ -385,7 +384,7 @@ void boardDisplay(void)
 
     else if (gBoard && gBoard->gameStatus == 2) {
         drawTextBackground();
-        drawText("Winner!  - Press R to reset");
+        drawText("Winner! - Press R to reset");
     }
 
     glPopMatrix();
@@ -419,11 +418,11 @@ void boardKey(unsigned char key, int x, int y)
 
     if (key == 'j') camYaw += rotStep;
     if (key == 'J') camYaw -= rotStep;
- 
+
     if (key == 'r' || key == 'R') {
         restartGame();
     }
-     
+
     if (key == 'p' || key == 'P') {
         toggleBoardPaused();
     }
@@ -448,7 +447,7 @@ void boardSpecialKey(int key, int x, int y)
 {
     (void)x;
     (void)y;
- 
+
     if (gBoard && (gBoard->paused || gBoard->gameStatus != 0)) {
         return;
     }
@@ -486,7 +485,7 @@ void restartGame(void)
     if (gBoard) {
         gBoard->gameStatus = 0;
         gBoard->wallMode = 0;
-        gBoard->paused = 0;  
+        gBoard->paused = 0;
     }
 
     characterInit();
@@ -499,6 +498,6 @@ void setEndGame(void)
     if (!gBoard) return;
 
     if (isPacmanAlive() == 0) {
-        gBoard->gameStatus = 1;   
+        gBoard->gameStatus = 1;
     }
 }

@@ -15,7 +15,7 @@ void timer(int v);
 
 int getPacmanRow(Pacman p);
 int getPacmanCol(Pacman p);
-int getPacmanSteps(Pacman p);   
+int getPacmanSteps(Pacman p);
 
 int isPacmanAlive(void);
 

@@ -29,7 +29,7 @@ struct pacman {
     int nextKey;
     float t;
     int moving;
-    int steps;  // NOVO: Contador de passos
+    int steps;
 };
 
 struct ghost {
@@ -41,6 +41,7 @@ struct ghost {
     int moving;
     float speed;
     float colorR, colorG, colorB;
+    float rotation;
 };
 
 typedef struct {
@@ -157,6 +158,31 @@ int reachedPacman(Ghost g)
         setEndGame();
         return 1;
     }
+
+    if (p->moving && g->moving) {
+        if (p->nC == g->c && p->nR == g->r && g->nC == p->c && g->nR == p->r) {
+            p->alive = 0;
+            setEndGame();
+            return 1;
+        }
+    }
+
+    if (p->moving) {
+        if (p->nC == g->c && p->nR == g->r) {
+            p->alive = 0;
+            setEndGame();
+            return 1;
+        }
+    }
+
+    if (g->moving) {
+        if (g->nC == p->c && g->nR == p->r) {
+            p->alive = 0;
+            setEndGame();
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -177,6 +203,10 @@ void updateAllGhosts(void)
     for (int i = 0; i < ghostCount; i++) {
         Ghost g = ghosts[i];
         if (!g) continue;
+
+        g->rotation += 0.3;
+        if (g->rotation >= 360.0) g->rotation -= 360.0;
+
         if (g->moving) {
             g->t += g->speed;
 
@@ -238,7 +268,6 @@ void updateAllGhosts(void)
 
 void timer(int v)
 {
- 
     int paused = getBoardPaused();
     int gameStatus = getBoardGameStatus();
 
@@ -256,7 +285,7 @@ void timer(int v)
                 p->t = 0.0;
 
                 if (checkWinCondition()) {
-                    setBoardGameStatus(2);  
+                    setBoardGameStatus(2);
                 }
             }
         }
@@ -361,7 +390,7 @@ int getPacmanCol(Pacman p)
 {
     return p ? p->c : -1;
 }
- 
+
 int getPacmanSteps(Pacman p)
 {
     return p ? p->steps : 0;
@@ -407,7 +436,7 @@ void buildSphere(void)
 
 void characterInit(void)
 {
-    static struct pacman pacData = { 0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0 };  
+    static struct pacman pacData = { 0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0 };
     static Pacman pac = &pacData;
 
     static int sphereBuilt = 0;
@@ -445,7 +474,7 @@ void characterInit(void)
         pac->moving = 0;
         pac->nextKey = 0;
         pac->currentKey = 0;
-        pac->steps = 0;  
+        pac->steps = 0;
         setBoardPacman(pac);
 
         Cell c = cellAt(m, houses[k].r, houses[k].c);
@@ -490,7 +519,11 @@ void characterInit(void)
                 int testC = housesGhost[k].c;
                 int testR = housesGhost[k].r;
 
-                if (testR == pac->r && testC == pac->c) {
+                int distC = abs(testC - pac->c);
+                int distR = abs(testR - pac->r);
+                int distance = distC + distR;
+
+                if (distance < 3) {
                     attempts++;
                     continue;
                 }
@@ -528,6 +561,7 @@ void characterInit(void)
             ghostArray[i]->t = 0.0;
             ghostArray[i]->moving = 0;
             ghostArray[i]->speed = 0.003 + ((float)(rand() % 4) * 0.006);
+            ghostArray[i]->rotation = (float)(rand() % 360);
             ghostArray[i]->colorR = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
             ghostArray[i]->colorG = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
             ghostArray[i]->colorB = 0.1 + ((float)rand() / (float)RAND_MAX) * 0.9;
@@ -539,9 +573,13 @@ void characterInit(void)
 
     free(houses);
 }
-
+/*
 static void drawSingleGhost(Ghost g)
 {
+    glPushMatrix();
+
+    glRotatef(g->rotation, 0.0, 1.0, 0.0);
+
     glColor3f(g->colorR, g->colorG, g->colorB);
     glutSolidCube(1.0);
 
@@ -565,6 +603,47 @@ static void drawSingleGhost(Ghost g)
     glPushMatrix();
     glTranslatef(0.2, 0.2, 0.65);
     glutSolidSphere(0.08, 16, 16);
+    glPopMatrix();
+
+    glPopMatrix();
+}*/
+
+static void drawSingleGhost(Ghost g)
+{
+    glColor3f(g->colorR, g->colorG, g->colorB);
+
+    glPushMatrix();
+    glRotatef(g->rotation, 0.0, 1.0, 0.0);
+    glScalef(0.7, 0.9, 0.7);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glColor3f(1.0, 1.0, 1.0);
+    glPushMatrix();
+    glRotatef(g->rotation, 0.0, 1.0, 0.0);
+    glTranslatef(-0.15, 0.25, 0.4);
+    glScalef(0.8, 1.0, 1.0);
+    glutSolidSphere(0.12, 16, 16);
+    glPopMatrix();
+
+    glPushMatrix();
+    glRotatef(g->rotation, 0.0, 1.0, 0.0);
+    glTranslatef(0.15, 0.25, 0.4);
+    glScalef(0.8, 1.0, 1.0);
+    glutSolidSphere(0.12, 16, 16);
+    glPopMatrix();
+
+    glColor3f(0.0, 0.0, 0.0);
+    glPushMatrix();
+    glRotatef(g->rotation, 0.0, 1.0, 0.0);
+    glTranslatef(-0.15, 0.25, 0.48);
+    glutSolidSphere(0.06, 16, 16);
+    glPopMatrix();
+
+    glPushMatrix();
+    glRotatef(g->rotation, 0.0, 1.0, 0.0);
+    glTranslatef(0.15, 0.25, 0.48);
+    glutSolidSphere(0.06, 16, 16);
     glPopMatrix();
 }
 
@@ -764,7 +843,17 @@ int characterMove(int key)
     p->nR = nr;
     p->t = 0.0;
     p->moving = 1;
-    p->steps++;   
+    p->steps++;
+
+    Ghost* ghosts = getGhosts();
+    int ghostCount = getBoardGhostCount();
+    if (ghosts) {
+        for (int i = 0; i < ghostCount; i++) {
+            if (reachedPacman(ghosts[i])) {
+                return 0;
+            }
+        }
+    }
 
     return 1;
 }
